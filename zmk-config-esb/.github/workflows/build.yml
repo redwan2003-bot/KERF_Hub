@@ -1,0 +1,18 @@
+name: Build ZMK ESB Firmware
+
+on:
+  push:
+    paths:
+      - 'zmk-config-esb/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'zmk-config-esb/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@753d8b467125fe860eec05ee71cb7ebefa08fba6
+    with:
+      build_matrix_path: 'zmk-config-esb/build.yaml'
+      config_path: 'zmk-config-esb/config'

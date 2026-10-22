@@ -1,0 +1,18 @@
+if SHIELD_BYRANTK_LP63_DONGLE
+
+config ZMK_KEYBOARD_NAME
+	default "kerf_keeb Dongle"
+
+config ZMK_SPLIT
+	default y
+
+config ZMK_SPLIT_ROLE_CENTRAL
+	default y
+
+config ZMK_STUDIO
+	default y
+
+config ZMK_STUDIO_LOCKING
+	default y
+
+endif

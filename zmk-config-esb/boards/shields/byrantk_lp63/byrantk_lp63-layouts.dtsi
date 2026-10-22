@@ -1,0 +1,17 @@
+#include <physical_layouts.dtsi>
+
+/ {
+	physical_layout0: physical_layout_0 {
+		compatible = "zmk,physical-layout";
+		display-name = "Default Layout (65 Keys)";
+		transform = <&default_transform>;
+		kscan = <&kscan0>;
+		keys = <
+			&key_pos_0  &key_pos_1  &key_pos_2  &key_pos_3  &key_pos_4  &key_pos_5  &key_pos_6  &key_pos_7  &key_pos_8  &key_pos_9  &key_pos_10 &key_pos_11 &key_pos_12
+			&key_pos_13 &key_pos_14 &key_pos_15 &key_pos_16 &key_pos_17 &key_pos_18 &key_pos_19 &key_pos_20 &key_pos_21 &key_pos_22 &key_pos_23 &key_pos_24 &key_pos_25
+			&key_pos_26 &key_pos_27 &key_pos_28 &key_pos_29 &key_pos_30 &key_pos_31 &key_pos_32 &key_pos_33 &key_pos_34 &key_pos_35 &key_pos_36 &key_pos_37 &key_pos_38
+			&key_pos_39 &key_pos_40 &key_pos_41 &key_pos_42 &key_pos_43 &key_pos_44 &key_pos_45 &key_pos_46 &key_pos_47 &key_pos_48 &key_pos_49 &key_pos_50 &key_pos_51
+			&key_pos_52 &key_pos_53 &key_pos_54 &key_pos_55 &key_pos_56 &key_pos_57 &key_pos_58 &key_pos_59 &key_pos_60 &key_pos_61 &key_pos_62 &key_pos_63 &key_pos_64
+		>;
+	};
+};

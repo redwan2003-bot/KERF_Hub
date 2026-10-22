@@ -1,0 +1,23 @@
+name: Firmware Matrix CI
+
+on:
+  push:
+    branches: [ main, 'feat/**' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-ble:
+    name: Build BLE Targets
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@753d8b467125fe860eec05ee71cb7ebefa08fba6
+    with:
+      build_matrix_path: 'zmk-config-byrantk_lp63/build.yaml'
+      config_path: 'zmk-config-byrantk_lp63/config'
+
+  build-esb:
+    name: Build ESB Targets
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@753d8b467125fe860eec05ee71cb7ebefa08fba6
+    with:
+      build_matrix_path: 'zmk-config-esb/build.yaml'
+      config_path: 'zmk-config-esb/config'

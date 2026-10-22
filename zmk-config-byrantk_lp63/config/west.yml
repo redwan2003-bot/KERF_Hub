@@ -1,0 +1,11 @@
+manifest:
+  remotes:
+    - name: zmkfirmware
+      url-base: https://github.com/zmkfirmware
+  projects:
+    - name: zmk
+      remote: zmkfirmware
+      revision: 753d8b467125fe860eec05ee71cb7ebefa08fba6
+      import: app/nano.yml
+  self:
+    path: config

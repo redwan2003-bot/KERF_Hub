@@ -1,0 +1,18 @@
+description: Split LED strip wrapper exposing a subset of pixels to underglow and reserving the remainder
+compatible: "kerf,led-strip-split"
+
+include: [base.yaml]
+
+properties:
+  chain-length:
+    type: int
+    required: true
+    description: Total number of pixels in the physical chain (e.g. 9)
+  underglow-pixels:
+    type: int
+    required: true
+    description: Number of pixels exposed to underglow (e.g. 8)
+  raw-led-strip:
+    type: phandle
+    required: true
+    description: Underlying physical LED strip phandle (WS2812 over SPI)

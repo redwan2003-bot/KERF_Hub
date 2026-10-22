@@ -1,0 +1,24 @@
+if SHIELD_BYRANTK_LP63_ESB_DONGLE
+
+config ZMK_KEYBOARD_NAME
+	default "kerf_keeb ESB Dongle"
+
+config ZMK_SPLIT
+	default y
+
+config ZMK_SPLIT_ROLE_CENTRAL
+	default y
+
+config ZMK_SPLIT_BLE
+	default n
+
+config ZMK_SPLIT_ESB
+	default y
+
+config ZMK_STUDIO
+	default y
+
+config ZMK_STUDIO_LOCKING
+	default y
+
+endif

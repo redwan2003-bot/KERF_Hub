@@ -1,0 +1,4 @@
+description: Battery indicator behavior driving LED9
+compatible: "zmk,behavior-batled"
+
+include: [base.yaml]

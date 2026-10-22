@@ -1,0 +1,5 @@
+board:
+  name: kerf_dongle
+  vendor: kerf
+  socs:
+    - name: nrf52833

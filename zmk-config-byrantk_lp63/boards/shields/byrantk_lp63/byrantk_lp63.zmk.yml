@@ -1,0 +1,11 @@
+file_format: "1"
+id: byrantk_lp63
+name: kerf_keeb (ByranTK LP63)
+type: shield
+url: https://github.com/redwan2003-bot/KERF_Hub
+requires: [pro_micro]
+features:
+  - keys
+  - encoder
+  - display
+  - studio

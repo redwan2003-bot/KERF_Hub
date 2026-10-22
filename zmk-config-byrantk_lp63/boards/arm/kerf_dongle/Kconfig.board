@@ -1,0 +1,3 @@
+config BOARD_KERF_DONGLE
+	bool "kerf_dongle nRF52833 Dongle"
+	depends on SOC_NRF52833_QDAA

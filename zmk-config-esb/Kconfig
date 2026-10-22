@@ -1,0 +1,34 @@
+menu "Kerf Firmware Features"
+
+config KERF_LED_SPLIT
+	bool "Kerf LED Strip Split Driver"
+	default y
+	help
+	  Splits physical 9-pixel LED strip into 8 underglow pixels and 1 battery pixel.
+
+config KERF_BATLED
+	bool "Kerf Battery LED Indicator"
+	default y
+	help
+	  Drives pixel 9 for battery status indication.
+
+config KERF_BATLED_TAP_MS
+	int "BatLED tap show duration in milliseconds"
+	default 1000
+
+config KERF_BATLED_MAX_HOLD_MS
+	int "BatLED max hold duration in milliseconds"
+	default 10000
+
+config KERF_BATLED_LOW_REPEAT_MIN
+	int "BatLED low battery warning repeat interval (minutes)"
+	default 5
+
+config KERF_DONGLE_STATUS_LED
+	bool "Kerf Dongle RGB Status LED"
+	default y
+	depends on BOARD_KERF_DONGLE
+	help
+	  Active-low RGB status LED driver for kerf_dongle.
+
+endmenu

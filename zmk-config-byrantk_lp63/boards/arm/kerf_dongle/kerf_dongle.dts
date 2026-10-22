@@ -1,0 +1,83 @@
+/dts-v1/;
+#include <nordic/nrf52833_qdaa.dtsi>
+
+/ {
+	model = "kerf_dongle";
+	compatible = "kerf,kerf-dongle", "nordic,nrf52833-qdaa", "nordic,nrf52833";
+
+	chosen {
+		zephyr,code-partition = &code_partition;
+		zephyr,sram = &sram0;
+		zephyr,flash = &flash0;
+		zmk,battery = &vbatt;
+		zephyr,console = &cdc_acm_uart;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		status_led_r: led_0 {
+			gpios = <&gpio0 29 GPIO_ACTIVE_LOW>;
+			label = "Red Status LED";
+		};
+		status_led_g: led_1 {
+			gpios = <&gpio0 30 GPIO_ACTIVE_LOW>;
+			label = "Green Status LED";
+		};
+		status_led_b: led_2 {
+			gpios = <&gpio0 31 GPIO_ACTIVE_LOW>;
+			label = "Blue Status LED";
+		};
+	};
+
+	aliases {
+		led0 = &status_led_r;
+		led1 = &status_led_g;
+		led2 = &status_led_b;
+	};
+
+	vbatt: vbatt {
+		compatible = "zmk,battery-nrf-vddh";
+		label = "BATTERY";
+	};
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		sd_partition: partition@0 {
+			label = "softdevice";
+			reg = <0x00000000 0x00026000>;
+		};
+		code_partition: partition@26000 {
+			label = "code_partition";
+			reg = <0x00026000 0x0004a000>;
+		};
+		storage_partition: partition@70000 {
+			label = "storage";
+			reg = <0x00070000 0x00008000>;
+		};
+		boot_partition: partition@78000 {
+			label = "adafruit_boot";
+			reg = <0x00078000 0x00008000>;
+		};
+	};
+};
+
+&usbd {
+	status = "okay";
+	cdc_acm_uart: cdc_acm_uart {
+		compatible = "zephyr,cdc-acm-uart";
+		label = "CDC_ACM_0";
+	};
+};
+
+&gpio0 {
+	status = "okay";
+};
+
+&gpio1 {
+	status = "okay";
+};

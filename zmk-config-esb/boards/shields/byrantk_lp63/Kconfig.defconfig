@@ -1,0 +1,12 @@
+if SHIELD_BYRANTK_LP63
+
+config ZMK_KEYBOARD_NAME
+	default "kerf_keeb LP63"
+
+config ZMK_STUDIO
+	default y
+
+config ZMK_STUDIO_LOCKING
+	default y
+
+endif

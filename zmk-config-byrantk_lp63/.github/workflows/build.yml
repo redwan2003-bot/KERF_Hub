@@ -1,0 +1,18 @@
+name: Build ZMK Firmware
+
+on:
+  push:
+    paths:
+      - 'zmk-config-byrantk_lp63/**'
+      - '.github/workflows/**'
+  pull_request:
+    paths:
+      - 'zmk-config-byrantk_lp63/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@753d8b467125fe860eec05ee71cb7ebefa08fba6
+    with:
+      build_matrix_path: 'zmk-config-byrantk_lp63/build.yaml'
+      config_path: 'zmk-config-byrantk_lp63/config'

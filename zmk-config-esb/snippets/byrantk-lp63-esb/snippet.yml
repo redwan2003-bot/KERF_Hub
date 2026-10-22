@@ -1,0 +1,4 @@
+name: byrantk-lp63-esb
+description: Configures kerf_keeb LP63 as an ESB 2.4GHz split peripheral
+append:
+  EXTRA_CONF_FILE: byrantk-lp63-esb.conf

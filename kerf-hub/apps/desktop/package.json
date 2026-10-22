@@ -1,0 +1,9 @@
+{
+  "name": "@kerf/desktop",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tauri 2 desktop wrapper placeholder (Phase 6)",
+  "scripts": {
+    "build": "echo 'Desktop build placeholder for Phase 6'"
+  }
+}

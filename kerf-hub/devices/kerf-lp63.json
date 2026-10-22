@@ -1,0 +1,36 @@
+{
+  "modelId": "kerf-lp63",
+  "name": "kerf_keeb LP63",
+  "usb": {
+    "vid": "0x1D50",
+    "pid": "0x615E"
+  },
+  "capabilities": [
+    "KEYMAP",
+    "ENCODER",
+    "LIGHTING_UNDERGLOW",
+    "BATLED",
+    "MACROS",
+    "PROFILES",
+    "DISPLAY_NICEVIEW"
+  ],
+  "display": {
+    "type": "nice!view",
+    "width": 160,
+    "height": 68,
+    "bpp": 1
+  },
+  "lighting": {
+    "underglowPixels": 8,
+    "batledPixel": 9
+  },
+  "firmware": {
+    "bootloader": "adafruit-uf2",
+    "uf2Family": "0xADA52840"
+  },
+  "matrix": {
+    "rows": 8,
+    "columns": 9,
+    "keys": 65
+  }
+}

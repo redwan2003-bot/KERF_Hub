@@ -45,7 +45,11 @@ jobs:
       - name: Build LP63 Firmware
         working-directory: zmk-config-byrantk_lp63
         run: |
-          west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=byrantk_lp63 -DZMK_CONFIG="$(pwd)/config"
+          EXTRA_ARGS=""
+          if [ -d "$GITHUB_WORKSPACE/modules/zmk-kerf" ]; then
+            EXTRA_ARGS="-DZEPHYR_EXTRA_MODULES=$GITHUB_WORKSPACE/modules/zmk-kerf"
+          fi
+          west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=byrantk_lp63 -DZMK_CONFIG="$(pwd)/config" $EXTRA_ARGS
 
       - name: Archive UF2 Artifact
         uses: actions/upload-artifact@v4

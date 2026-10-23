@@ -1,5 +1,7 @@
 import { StudioRpcClient } from './rpc/client';
+import { KerfClient } from './rpc/kerf-client';
 import { DeviceState, PhysicalKey, KeymapLayer } from './rpc/types';
+import { UnderglowConfig, BatledConfig, PowerConfig } from '@kerf/protocol';
 
 export function getDefaultLP63Keys(): PhysicalKey[] {
   const keys: PhysicalKey[] = [];
@@ -59,9 +61,16 @@ export function getDefaultLP63Layers(): KeymapLayer[] {
   ];
 }
 
+export interface ExtendedDeviceState extends DeviceState {
+  underglow: UnderglowConfig;
+  batled: BatledConfig;
+  power: PowerConfig;
+}
+
 export class SessionManager {
   private client: StudioRpcClient;
-  private state: DeviceState = {
+  private kerfClient: KerfClient;
+  private state: ExtendedDeviceState = {
     connected: false,
     modelId: 'kerf-lp63',
     name: 'kerf_keeb LP63',
@@ -69,18 +78,43 @@ export class SessionManager {
     activeLayer: 0,
     layers: getDefaultLP63Layers(),
     keys: getDefaultLP63Keys(),
+    underglow: {
+      on: true,
+      hue: 160,
+      saturation: 100,
+      brightness: 50,
+      effect: 0,
+      speed: 1,
+      autoOffIdle: true,
+      autoOffUsb: false,
+    },
+    batled: {
+      brightness: 100,
+      lowBrightness: 20,
+      tapMs: 1000,
+      maxHoldMs: 10000,
+      lowPercent: 10,
+      repeatMin: 5,
+    },
+    power: {
+      debouncePressMs: 5,
+      debounceReleaseMs: 5,
+      idleTimeoutMs: 30000,
+      deepSleepTimeoutMs: 900000,
+    },
   };
-  private listeners: Array<(state: DeviceState) => void> = [];
+  private listeners: Array<(state: ExtendedDeviceState) => void> = [];
 
   constructor() {
     this.client = new StudioRpcClient();
+    this.kerfClient = new KerfClient();
     this.client.setOnStateChange((partial) => {
       this.state = { ...this.state, ...partial };
       this.notify();
     });
   }
 
-  public subscribe(listener: (state: DeviceState) => void): () => void {
+  public subscribe(listener: (state: ExtendedDeviceState) => void): () => void {
     this.listeners.push(listener);
     listener(this.state);
     return () => {
@@ -130,7 +164,25 @@ export class SessionManager {
     }
   }
 
-  public getState(): DeviceState {
+  public async updateUnderglow(cfg: Partial<UnderglowConfig>): Promise<void> {
+    this.state.underglow = { ...this.state.underglow, ...cfg };
+    this.notify();
+    await this.kerfClient.setUnderglow(this.state.underglow);
+  }
+
+  public async updateBatled(cfg: Partial<BatledConfig>): Promise<void> {
+    this.state.batled = { ...this.state.batled, ...cfg };
+    this.notify();
+    await this.kerfClient.setBatled(this.state.batled);
+  }
+
+  public async updatePower(cfg: Partial<PowerConfig>): Promise<void> {
+    this.state.power = { ...this.state.power, ...cfg };
+    this.notify();
+    await this.kerfClient.setPowerConfig(this.state.power);
+  }
+
+  public getState(): ExtendedDeviceState {
     return this.state;
   }
 }

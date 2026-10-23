@@ -6,6 +6,7 @@
   "types": "./src/index.ts",
   "dependencies": {
     "@kerf/core": "workspace:*",
+    "@kerf/protocol": "workspace:*",
     "lucide-react": "^0.460.0",
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.5.4"

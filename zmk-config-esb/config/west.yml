@@ -12,5 +12,7 @@ manifest:
     - name: zmk-feature-split-esb
       remote: damex
       revision: v0.8.14
+    - name: zmk-kerf
+      path: modules/zmk-kerf
   self:
     path: config

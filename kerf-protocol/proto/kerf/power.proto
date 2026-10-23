@@ -1,0 +1,44 @@
+syntax = "proto3";
+package kerf.power;
+
+message PowerConfig {
+  uint32 debounce_press_ms = 1;     // 1 - 20 ms
+  uint32 debounce_release_ms = 2;   // 1 - 20 ms
+  uint32 idle_timeout_ms = 3;       // Inactivity timeout before idle (ms)
+  uint32 deep_sleep_timeout_ms = 4; // Inactivity timeout before deep sleep (ms)
+}
+
+message GetPowerConfigRequest {}
+
+message GetPowerConfigResponse {
+  PowerConfig config = 1;
+  uint32 battery_percent = 2;
+  bool is_charging = 3;
+  uint32 estimated_hours_remaining = 4;
+}
+
+message SetPowerConfigRequest {
+  PowerConfig config = 1;
+}
+
+message SetPowerConfigResponse {}
+
+message Request {
+  oneof command {
+    GetPowerConfigRequest get_config = 1;
+    SetPowerConfigRequest set_config = 2;
+  }
+}
+
+message Response {
+  oneof result {
+    GetPowerConfigResponse get_config = 1;
+    SetPowerConfigResponse set_config = 2;
+  }
+}
+
+message Notification {
+  oneof event {
+    GetPowerConfigResponse config_changed = 1;
+  }
+}

@@ -5,3 +5,5 @@ export * from './components/KeyboardRenderer';
 export * from './components/BehaviorPalette';
 export * from './components/LayerManager';
 export * from './components/UnlockModal';
+export * from './components/LightingEditor';
+export * from './components/PowerEditor';

@@ -1,0 +1,24 @@
+menu "ZMK Kerf Configurator Module"
+
+config ZMK_KERF
+	bool "ZMK Kerf Subsystem Support"
+	default y
+	select SETTINGS
+	help
+	  Enables Kerf Protocol handling for lighting, battery, power, and profiles.
+
+config ZMK_KERF_USB_HID
+	bool "Kerf USB Vendor Raw HID Transport"
+	default y
+	depends on ZMK_KERF && USB_DEVICE_STACK
+	help
+	  Exposes 64-byte raw HID report interface on Usage Page 0xFF60.
+
+config ZMK_KERF_BLE_GATT
+	bool "Kerf BLE GATT Service Transport"
+	default y
+	depends on ZMK_KERF && BT
+	help
+	  Exposes custom GATT service for Kerf Protocol over Bluetooth Low Energy.
+
+endmenu

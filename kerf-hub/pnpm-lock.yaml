@@ -67,6 +67,10 @@ importers:
         version: 5.4.21
 
   packages/core:
+    dependencies:
+      '@kerf/protocol':
+        specifier: workspace:*
+        version: link:../protocol
     devDependencies:
       typescript:
         specifier: ^5.7.3
@@ -84,11 +88,23 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9
 
+  packages/protocol:
+    devDependencies:
+      typescript:
+        specifier: ^5.7.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9
+
   packages/ui:
     dependencies:
       '@kerf/core':
         specifier: workspace:*
         version: link:../core
+      '@kerf/protocol':
+        specifier: workspace:*
+        version: link:../protocol
       clsx:
         specifier: ^2.1.1
         version: 2.1.1

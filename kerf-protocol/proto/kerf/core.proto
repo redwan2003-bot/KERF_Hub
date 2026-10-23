@@ -1,0 +1,59 @@
+syntax = "proto3";
+package kerf.core;
+
+enum DeviceRole {
+  STANDALONE = 0;
+  CENTRAL_DONGLE = 1;
+  PERIPHERAL = 2;
+}
+
+enum LinkType {
+  USB = 0;
+  BLE = 1;
+  ESB = 2;
+}
+
+message GetDeviceInfoRequest {}
+
+message GetDeviceInfoResponse {
+  string model_id = 1;
+  uint32 usb_vid = 2;
+  uint32 usb_pid = 3;
+  string fw_version = 4;
+  uint32 protocol_version = 5;
+  uint32 capabilities = 6;
+  DeviceRole role = 7;
+  uint32 battery_percent = 8;
+  bool charging = 9;
+  LinkType link = 10;
+  bool locked = 11;
+}
+
+message RebootBootloaderRequest {}
+message RebootBootloaderResponse {}
+
+message FactoryResetRequest {}
+message FactoryResetResponse {}
+
+message Request {
+  oneof command {
+    GetDeviceInfoRequest    get_device_info    = 1;
+    RebootBootloaderRequest reboot_bootloader  = 2;
+    FactoryResetRequest     factory_reset      = 3;
+  }
+}
+
+message Response {
+  oneof result {
+    GetDeviceInfoResponse    get_device_info    = 1;
+    RebootBootloaderResponse reboot_bootloader  = 2;
+    FactoryResetResponse     factory_reset      = 3;
+  }
+}
+
+message Notification {
+  oneof event {
+    bool lock_changed = 1;
+    uint32 battery_changed = 2;
+  }
+}

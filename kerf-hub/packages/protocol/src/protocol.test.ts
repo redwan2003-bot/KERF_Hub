@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
 import {
   encodeKerfRequest,
   decodeKerfResponse,
@@ -167,5 +169,49 @@ describe('Kerf Protocol Codecs & Macros', () => {
     expect(mouseConfig.pollingRate).toBe(PollingRate.RATE_1000HZ);
     expect(mouseConfig.lod).toBe(LiftOffDistance.LOD_1MM);
     expect(mouseConfig.stages[1].dpiX).toBe(800);
+  });
+
+  it('validates device descriptors for all family devices', () => {
+    const devicesDir = path.resolve(__dirname, '../../../devices');
+    const deviceFiles = ['kerf-lp63.json', 'kerf-macropad.json', 'kerf-mouse.json'];
+
+    for (const file of deviceFiles) {
+      const filePath = path.join(devicesDir, file);
+      expect(fs.existsSync(filePath), `Descriptor file ${file} must exist`).toBe(true);
+
+      const content = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+      expect(content.modelId).toBeDefined();
+      expect(content.name).toBeDefined();
+      expect(content.usb.vid).toBe('0x1D50');
+      expect(Array.isArray(content.capabilities)).toBe(true);
+      expect(content.capabilities.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('serializes and deserializes pointer RPC messages', () => {
+    const req = {
+      requestId: 55,
+      subsystem: 'pointer' as const,
+      command: 'setConfig',
+      payload: {
+        activeStage: 0,
+        pollingRate: PollingRate.RATE_1000HZ,
+      },
+    };
+
+    const encoded = encodeKerfRequest(req);
+    expect(encoded.length).toBeGreaterThan(0);
+
+    const resp = {
+      requestId: 55,
+      error: ErrorCode.OK,
+      subsystem: 'pointer' as const,
+      payload: { success: true },
+    };
+
+    const decoded = decodeKerfResponse(new TextEncoder().encode(JSON.stringify(resp)));
+    expect(decoded.requestId).toBe(55);
+    expect(decoded.subsystem).toBe('pointer');
+    expect(decoded.error).toBe(ErrorCode.OK);
   });
 });

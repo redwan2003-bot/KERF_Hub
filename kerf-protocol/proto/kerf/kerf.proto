@@ -5,6 +5,7 @@ import "kerf/core.proto";
 import "kerf/lighting.proto";
 import "kerf/macros.proto";
 import "kerf/profiles.proto";
+import "kerf/display.proto";
 import "kerf/power.proto";
 
 enum ErrorCode {
@@ -23,6 +24,7 @@ message Request {
     lighting.Request lighting = 11;
     macros.Request   macros   = 12;
     profiles.Request profiles = 13;
+    display.Request  display  = 14;
     power.Request    power    = 15;
   }
 }
@@ -35,6 +37,7 @@ message Response {
     lighting.Response lighting = 11;
     macros.Response   macros   = 12;
     profiles.Response profiles = 13;
+    display.Response  display  = 14;
     power.Response    power    = 15;
   }
 }
@@ -44,6 +47,8 @@ message Notification {
     core.Notification     core     = 10;
     lighting.Notification lighting = 11;
     macros.Notification   macros   = 12;
+    profiles.Notification profiles = 13;
+    display.Notification  display  = 14;
     power.Notification    power    = 15;
   }
 }

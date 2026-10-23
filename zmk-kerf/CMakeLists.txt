@@ -10,6 +10,8 @@ if(CONFIG_ZMK_KERF)
     src/rpc/lighting_service.c
     src/rpc/macros_service.c
     src/rpc/profiles_service.c
+    src/rpc/display_service.c
+    src/display/kerf_status_screen.c
     src/rpc/power_service.c
     src/behaviors/behavior_kmacro.c
   )

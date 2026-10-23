@@ -11,6 +11,7 @@ import {
   MAX_PROFILES,
   KerfProfileFile,
   validateKerfProfileFile,
+  WidgetConfig,
 } from '@kerf/protocol';
 
 export function getDefaultLP63Keys(): PhysicalKey[] {
@@ -78,6 +79,7 @@ export interface ExtendedDeviceState extends DeviceState {
   macros: MacroSlot[];
   activeProfileId: number;
   profiles: ProfileData[];
+  display: WidgetConfig;
 }
 
 export class SessionManager {
@@ -150,6 +152,17 @@ export class SessionManager {
       },
       macros: [],
     })),
+    display: {
+      showBattery: true,
+      showLayer: true,
+      showBtProfile: true,
+      showCapsLock: true,
+      showWpm: false,
+      showClock: false,
+      invertColors: false,
+      rotate180: false,
+      screenOffOnIdle: true,
+    },
   };
   private listeners: Array<(state: ExtendedDeviceState) => void> = [];
 
@@ -314,6 +327,20 @@ export class SessionManager {
 
   public async factoryReset(): Promise<void> {
     await this.kerfClient.factoryReset();
+  }
+
+  public async updateDisplayLayout(cfg: Partial<WidgetConfig>): Promise<void> {
+    this.state.display = { ...this.state.display, ...cfg };
+    this.notify();
+    await this.kerfClient.setDisplayLayout(this.state.display);
+  }
+
+  public async uploadDisplayFrame(
+    frameIdx: number,
+    frameBytes: Uint8Array,
+    onProgress?: (pct: number) => void,
+  ): Promise<void> {
+    await this.kerfClient.uploadDisplayImage(frameIdx, frameBytes, onProgress);
   }
 
   public getState(): ExtendedDeviceState {

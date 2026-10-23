@@ -1,0 +1,58 @@
+syntax = "proto3";
+package kerf.display;
+
+message WidgetConfig {
+  bool show_battery = 1;
+  bool show_layer = 2;
+  bool show_bt_profile = 3;
+  bool show_caps_lock = 4;
+  bool show_wpm = 5;
+  bool show_clock = 6;
+  bool invert_colors = 7;
+  bool rotate_180 = 8;
+  bool screen_off_on_idle = 9;
+}
+
+message UploadChunkRequest {
+  uint32 frame_index = 1; // 0 - 29
+  uint32 byte_offset = 2; // 0 - 1359
+  bytes chunk_data = 3;   // <= 56 bytes per HID report
+  bool is_last_chunk = 4;
+}
+
+message UploadChunkResponse {
+  uint32 frame_index = 1;
+  uint32 next_offset = 2;
+  bool complete = 3;
+}
+
+message AnimationConfig {
+  uint32 total_frames = 1;   // 1 to 30
+  uint32 frame_delay_ms = 2; // e.g. 100ms
+  bool loop = 3;
+}
+
+message LiveDataPushRequest {
+  string now_playing = 1;
+  uint32 cpu_temp_c = 2;
+  uint32 gpu_temp_c = 3;
+  uint32 volume_pct = 4;
+}
+
+message Request {
+  oneof command {
+    WidgetConfig        set_layout = 1;
+    UploadChunkRequest  upload_chunk = 2;
+    AnimationConfig     set_animation = 3;
+    LiveDataPushRequest push_live_data = 4;
+  }
+}
+
+message Response {
+  oneof result {
+    bool                layout_acknowledged = 1;
+    UploadChunkResponse upload_response = 2;
+    bool                animation_acknowledged = 3;
+    bool                live_data_acknowledged = 4;
+  }
+}

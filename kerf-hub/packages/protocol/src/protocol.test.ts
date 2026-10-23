@@ -10,6 +10,11 @@ import {
   MAX_MACRO_STEPS,
   MAX_MACRO_SLOTS,
   MAX_PROFILES,
+  DISPLAY_WIDTH,
+  DISPLAY_HEIGHT,
+  DISPLAY_BYTES_PER_FRAME,
+  MAX_DISPLAY_FRAMES,
+  DISPLAY_CHUNK_SIZE,
   validateKerfProfileFile,
   KerfProfileFile,
 } from './index';
@@ -127,5 +132,16 @@ describe('Kerf Protocol Codecs & Macros', () => {
     expect(() => validateKerfProfileFile({ format: 'invalid', version: 1, data: {} })).toThrow();
     expect(() => validateKerfProfileFile({ format: 'kerfprofile', version: 0, data: {} })).toThrow();
     expect(() => validateKerfProfileFile({ format: 'kerfprofile', version: 1 })).toThrow();
+  });
+
+  it('matches 160x68 1-bit nice!view display geometry and chunk bounds', () => {
+    expect(DISPLAY_WIDTH).toBe(160);
+    expect(DISPLAY_HEIGHT).toBe(68);
+    expect(DISPLAY_BYTES_PER_FRAME).toBe((160 * 68) / 8); // 1360 bytes
+    expect(MAX_DISPLAY_FRAMES).toBe(30);
+
+    // Chunks needed for full frame transfer
+    const chunksNeeded = Math.ceil(DISPLAY_BYTES_PER_FRAME / DISPLAY_CHUNK_SIZE);
+    expect(chunksNeeded).toBe(25); // 24 * 56 + 16 = 1360 bytes
   });
 });

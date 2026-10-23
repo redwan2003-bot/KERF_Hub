@@ -1,6 +1,6 @@
 /**
  * @kerf/protocol — Protocol buffer TypeScript definitions and codecs
- * Corresponds to kerf.proto, core.proto, lighting.proto, power.proto, macros.proto, profiles.proto
+ * Corresponds to kerf.proto, core.proto, lighting.proto, power.proto, macros.proto, profiles.proto, display.proto
  */
 
 export const PROTOCOL_VERSION = 1;
@@ -101,6 +101,50 @@ export const MAX_MACRO_STEPS = 64;
 
 export const MAX_PROFILES = 3;
 
+export const DISPLAY_WIDTH = 160;
+export const DISPLAY_HEIGHT = 68;
+export const DISPLAY_BYTES_PER_FRAME = 1360; // 160 * 68 / 8
+export const MAX_DISPLAY_FRAMES = 30;
+export const DISPLAY_CHUNK_SIZE = 56;
+
+export interface WidgetConfig {
+  showBattery: boolean;
+  showLayer: boolean;
+  showBtProfile: boolean;
+  showCapsLock: boolean;
+  showWpm: boolean;
+  showClock: boolean;
+  invertColors: boolean;
+  rotate180: boolean;
+  screenOffOnIdle: boolean;
+}
+
+export interface UploadChunkRequest {
+  frameIndex: number;
+  byteOffset: number;
+  chunkData: Uint8Array;
+  isLastChunk: boolean;
+}
+
+export interface UploadChunkResponse {
+  frameIndex: number;
+  nextOffset: number;
+  complete: boolean;
+}
+
+export interface AnimationConfig {
+  totalFrames: number;
+  frameDelayMs: number;
+  loop: boolean;
+}
+
+export interface LiveDataPushRequest {
+  nowPlaying?: string;
+  cpuTempC?: number;
+  gpuTempC?: number;
+  volumePct?: number;
+}
+
 export interface ProfileMetadata {
   profileId: number; // 0, 1, 2
   name: string;
@@ -183,7 +227,7 @@ export function textToMacroSteps(text: string): MacroStep[] {
 
 export interface KerfRequest {
   requestId: number;
-  subsystem: 'core' | 'lighting' | 'power' | 'macros' | 'profiles';
+  subsystem: 'core' | 'lighting' | 'power' | 'macros' | 'profiles' | 'display';
   command: string;
   payload?: any;
 }
@@ -191,7 +235,7 @@ export interface KerfRequest {
 export interface KerfResponse {
   requestId: number;
   error: ErrorCode;
-  subsystem?: 'core' | 'lighting' | 'power' | 'macros' | 'profiles';
+  subsystem?: 'core' | 'lighting' | 'power' | 'macros' | 'profiles' | 'display';
   payload?: any;
 }
 

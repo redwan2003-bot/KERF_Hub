@@ -11,15 +11,16 @@ import {
   MacroEditor,
   ProfileManager,
   FirmwareUpdater,
+  DisplayEditor,
 } from '@kerf/ui';
 import { Header } from './components/Header';
 import { StatusBar } from './components/StatusBar';
-import { Keyboard, Palette, Zap, PlaySquare, Layers, Cpu } from 'lucide-react';
+import { Keyboard, Palette, Zap, PlaySquare, Layers, Cpu, Monitor } from 'lucide-react';
 
 export const App: React.FC = () => {
   const session = useMemo(() => new SessionManager(), []);
   const [deviceState, setDeviceState] = useState<ExtendedDeviceState>(session.getState());
-  const [activeTab, setActiveTab] = useState<'keymap' | 'lighting' | 'power' | 'macros' | 'profiles' | 'firmware'>('keymap');
+  const [activeTab, setActiveTab] = useState<'keymap' | 'lighting' | 'power' | 'macros' | 'profiles' | 'display' | 'firmware'>('keymap');
   const [selectedKeyIndex, setSelectedKeyIndex] = useState<number | null>(null);
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
 
@@ -149,6 +150,18 @@ export const App: React.FC = () => {
         </button>
         <button
           type="button"
+          onClick={() => setActiveTab('display')}
+          className={`flex items-center gap-2 text-xs font-mono font-medium py-3 border-b-2 transition-all ${
+            activeTab === 'display'
+              ? 'border-amber-400 text-amber-300 font-bold'
+              : 'border-transparent text-zinc-400 hover:text-zinc-200'
+          }`}
+        >
+          <Monitor className="w-4 h-4" />
+          DISPLAY & NICE!VIEW
+        </button>
+        <button
+          type="button"
           onClick={() => setActiveTab('firmware')}
           className={`flex items-center gap-2 text-xs font-mono font-medium py-3 border-b-2 transition-all ${
             activeTab === 'firmware'
@@ -232,6 +245,15 @@ export const App: React.FC = () => {
             onSaveProfile={(prof) => session.saveProfile(prof)}
             onExportProfile={handleExportProfile}
             onImportProfile={(id, json) => session.importProfile(id, json)}
+            disabled={deviceState.locked && deviceState.connected}
+          />
+        )}
+
+        {activeTab === 'display' && (
+          <DisplayEditor
+            config={deviceState.display}
+            onChangeConfig={(cfg) => session.updateDisplayLayout(cfg)}
+            onUploadFrame={(idx, bytes, onProgress) => session.uploadDisplayFrame(idx, bytes, onProgress)}
             disabled={deviceState.locked && deviceState.connected}
           />
         )}

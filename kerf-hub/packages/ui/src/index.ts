@@ -10,4 +10,5 @@ export * from './components/PowerEditor';
 export * from './components/MacroEditor';
 export * from './components/ProfileManager';
 export * from './components/FirmwareUpdater';
+export * from './components/DisplayEditor';
 

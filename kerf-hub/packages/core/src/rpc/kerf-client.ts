@@ -6,6 +6,11 @@ import {
   MacroSlot,
   ProfileMetadata,
   ProfileData,
+  WidgetConfig,
+  AnimationConfig,
+  LiveDataPushRequest,
+  DISPLAY_BYTES_PER_FRAME,
+  DISPLAY_CHUNK_SIZE,
   DeviceInfo,
   DeviceRole,
   LinkType,
@@ -190,6 +195,88 @@ export class KerfClient {
     payload[0] = 13; // KERF_SUBSYSTEM_PROFILES
     payload[1] = 4;  // ActivateProfile
     payload[2] = profileId;
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async setDisplayLayout(layout: WidgetConfig): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 14; // KERF_SUBSYSTEM_DISPLAY
+    payload[1] = 1;  // SetLayout
+    payload[2] = layout.showBattery ? 1 : 0;
+    payload[3] = layout.showLayer ? 1 : 0;
+    payload[4] = layout.showBtProfile ? 1 : 0;
+    payload[5] = layout.showCapsLock ? 1 : 0;
+    payload[6] = layout.showWpm ? 1 : 0;
+    payload[7] = layout.showClock ? 1 : 0;
+    payload[8] = layout.invertColors ? 1 : 0;
+    payload[9] = layout.rotate180 ? 1 : 0;
+    payload[10] = layout.screenOffOnIdle ? 1 : 0;
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async uploadDisplayChunk(
+    frameIdx: number,
+    offset: number,
+    chunkData: Uint8Array,
+    isLast: boolean,
+  ): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 14; // KERF_SUBSYSTEM_DISPLAY
+    payload[1] = 2;  // UploadChunk
+    payload[2] = frameIdx;
+    payload[3] = offset & 0xff;
+    payload[4] = (offset >> 8) & 0xff;
+    payload[5] = isLast ? 1 : 0;
+    payload[6] = chunkData.length;
+    payload.set(chunkData, 7);
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async uploadDisplayImage(
+    frameIdx: number,
+    frameBytes: Uint8Array,
+    onProgress?: (pct: number) => void,
+  ): Promise<void> {
+    const totalBytes = Math.min(frameBytes.length, DISPLAY_BYTES_PER_FRAME);
+    let offset = 0;
+
+    while (offset < totalBytes) {
+      const remaining = totalBytes - offset;
+      const chunkSize = Math.min(remaining, DISPLAY_CHUNK_SIZE);
+      const isLast = offset + chunkSize >= totalBytes;
+      const chunk = frameBytes.slice(offset, offset + chunkSize);
+
+      await this.uploadDisplayChunk(frameIdx, offset, chunk, isLast);
+      offset += chunkSize;
+
+      if (onProgress) {
+        onProgress(Math.round((offset / totalBytes) * 100));
+      }
+    }
+  }
+
+  public async setAnimationConfig(anim: AnimationConfig): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 14; // KERF_SUBSYSTEM_DISPLAY
+    payload[1] = 3;  // SetAnimation
+    payload[2] = anim.totalFrames;
+    payload[3] = anim.frameDelayMs & 0xff;
+    payload[4] = (anim.frameDelayMs >> 8) & 0xff;
+    payload[5] = anim.loop ? 1 : 0;
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async pushLiveData(data: LiveDataPushRequest): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 14; // KERF_SUBSYSTEM_DISPLAY
+    payload[1] = 4;  // PushLiveData
+    payload[2] = data.cpuTempC ?? 0;
+    payload[3] = data.gpuTempC ?? 0;
+    payload[4] = data.volumePct ?? 0;
     await this.transport.sendReport(0, payload);
   }
 

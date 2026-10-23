@@ -1,0 +1,10 @@
+description: Runtime configurable onboard macro behavior (&kmacro)
+compatible: "zmk,behavior-kmacro"
+
+include: [base.yaml]
+
+properties:
+  "#binding-cells":
+    type: int
+    required: true
+    const: 1

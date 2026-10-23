@@ -12,7 +12,7 @@ export const BehaviorPalette: React.FC<BehaviorPaletteProps> = ({
   onAssignKey,
   onClose,
 }) => {
-  const [activeTab, setActiveTab] = useState<'alpha' | 'numeric' | 'mod' | 'nav' | 'kerf'>('alpha');
+  const [activeTab, setActiveTab] = useState<'alpha' | 'numeric' | 'mod' | 'nav' | 'macro' | 'kerf'>('alpha');
 
   if (selectedKeyIndex === null) return null;
 
@@ -27,7 +27,7 @@ export const BehaviorPalette: React.FC<BehaviorPaletteProps> = ({
               Remap Key Position #{selectedKeyIndex}
             </span>
             <div className="flex gap-1.5 ml-4">
-              {(['alpha', 'numeric', 'mod', 'nav', 'kerf'] as const).map((tab) => (
+              {(['alpha', 'numeric', 'mod', 'nav', 'macro', 'kerf'] as const).map((tab) => (
                 <button
                   key={tab}
                   type="button"

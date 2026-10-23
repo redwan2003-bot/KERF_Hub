@@ -3,6 +3,7 @@ package kerf;
 
 import "kerf/core.proto";
 import "kerf/lighting.proto";
+import "kerf/macros.proto";
 import "kerf/power.proto";
 
 enum ErrorCode {
@@ -19,6 +20,7 @@ message Request {
   oneof subsystem {
     core.Request     core     = 10;
     lighting.Request lighting = 11;
+    macros.Request   macros   = 12;
     power.Request    power    = 15;
   }
 }
@@ -29,6 +31,7 @@ message Response {
   oneof subsystem {
     core.Response     core     = 10;
     lighting.Response lighting = 11;
+    macros.Response   macros   = 12;
     power.Response    power    = 15;
   }
 }
@@ -37,6 +40,7 @@ message Notification {
   oneof subsystem {
     core.Notification     core     = 10;
     lighting.Notification lighting = 11;
+    macros.Notification   macros   = 12;
     power.Notification    power    = 15;
   }
 }

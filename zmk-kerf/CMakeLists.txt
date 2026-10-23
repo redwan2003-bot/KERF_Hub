@@ -8,7 +8,9 @@ if(CONFIG_ZMK_KERF)
     src/settings/kerf_settings.c
     src/rpc/core_service.c
     src/rpc/lighting_service.c
+    src/rpc/macros_service.c
     src/rpc/power_service.c
+    src/behaviors/behavior_kmacro.c
   )
 
   if(CONFIG_ZMK_KERF_USB_HID)

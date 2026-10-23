@@ -78,9 +78,66 @@ export interface PowerConfig {
   deepSleepTimeoutMs: number;
 }
 
+export enum MacroAction {
+  TAP = 0,
+  PRESS = 1,
+  RELEASE = 2,
+  DELAY = 3,
+}
+
+export interface MacroStep {
+  action: MacroAction;
+  param: number; // keycode or delay in ms
+}
+
+export interface MacroSlot {
+  slotId: number; // 0 - 15
+  name: string;
+  steps: MacroStep[];
+}
+
+export const MAX_MACRO_SLOTS = 16;
+export const MAX_MACRO_STEPS = 64;
+
+/**
+ * Converts a text string into an array of sequential TAP macro steps.
+ */
+export function textToMacroSteps(text: string): MacroStep[] {
+  const steps: MacroStep[] = [];
+  for (let i = 0; i < text.length && steps.length < MAX_MACRO_STEPS; i++) {
+    const charCode = text.charCodeAt(i);
+    // Map basic ASCII characters to HID keycodes
+    let hidCode = 0;
+    if (charCode >= 97 && charCode <= 122) {
+      // a-z -> 0x04 to 0x1D
+      hidCode = 0x04 + (charCode - 97);
+    } else if (charCode >= 65 && charCode <= 90) {
+      // A-Z -> 0x04 to 0x1D
+      hidCode = 0x04 + (charCode - 65);
+    } else if (charCode >= 49 && charCode <= 57) {
+      // 1-9 -> 0x1E to 0x26
+      hidCode = 0x1e + (charCode - 49);
+    } else if (charCode === 48) {
+      // 0 -> 0x27
+      hidCode = 0x27;
+    } else if (charCode === 32) {
+      // space -> 0x2c
+      hidCode = 0x2c;
+    } else if (charCode === 10 || charCode === 13) {
+      // enter -> 0x28
+      hidCode = 0x28;
+    } else {
+      hidCode = 0x04; // default to 'a'
+    }
+
+    steps.push({ action: MacroAction.TAP, param: hidCode });
+  }
+  return steps;
+}
+
 export interface KerfRequest {
   requestId: number;
-  subsystem: 'core' | 'lighting' | 'power';
+  subsystem: 'core' | 'lighting' | 'power' | 'macros';
   command: string;
   payload?: any;
 }
@@ -88,7 +145,7 @@ export interface KerfRequest {
 export interface KerfResponse {
   requestId: number;
   error: ErrorCode;
-  subsystem?: 'core' | 'lighting' | 'power';
+  subsystem?: 'core' | 'lighting' | 'power' | 'macros';
   payload?: any;
 }
 

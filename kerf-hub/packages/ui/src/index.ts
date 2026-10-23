@@ -7,3 +7,5 @@ export * from './components/LayerManager';
 export * from './components/UnlockModal';
 export * from './components/LightingEditor';
 export * from './components/PowerEditor';
+export * from './components/MacroEditor';
+

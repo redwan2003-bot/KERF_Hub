@@ -15,7 +15,7 @@ export interface AvailableKey {
   code: string;
   label: string;
   sublabel?: string;
-  category: 'alpha' | 'numeric' | 'mod' | 'nav' | 'media' | 'layer' | 'kerf';
+  category: 'alpha' | 'numeric' | 'mod' | 'nav' | 'media' | 'layer' | 'kerf' | 'macro';
 }
 
 export const PALETTE_KEYS: AvailableKey[] = [
@@ -82,4 +82,12 @@ export const PALETTE_KEYS: AvailableKey[] = [
   { code: 'SNIP', label: 'Snip (Win+Shift+S)', sublabel: 'Screenshot key', category: 'kerf' },
   { code: 'RGB_TOG', label: 'RGB Toggle', category: 'kerf' },
   { code: 'RGB_EFF', label: 'RGB Next Effect', category: 'kerf' },
+
+  // Macros (&kmacro 0..15)
+  ...Array.from({ length: 16 }, (_, i) => ({
+    code: `KMACRO_${i}`,
+    label: `M${i}`,
+    sublabel: `&kmacro ${i}`,
+    category: 'macro' as const,
+  })),
 ];

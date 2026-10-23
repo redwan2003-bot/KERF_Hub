@@ -1,5 +1,15 @@
 import { WebHIDTransport } from '../transport/web-hid';
-import { UnderglowConfig, BatledConfig, PowerConfig, DeviceInfo, DeviceRole, LinkType, Capability, ErrorCode } from '@kerf/protocol';
+import {
+  UnderglowConfig,
+  BatledConfig,
+  PowerConfig,
+  MacroSlot,
+  DeviceInfo,
+  DeviceRole,
+  LinkType,
+  Capability,
+  ErrorCode,
+} from '@kerf/protocol';
 
 export class KerfClient {
   private transport: WebHIDTransport;
@@ -96,6 +106,39 @@ export class KerfClient {
     payload[1] = 2;  // SetPowerConfig
     payload[2] = cfg.debouncePressMs;
     payload[3] = cfg.debounceReleaseMs;
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async getMacroSlot(slotId: number): Promise<MacroSlot> {
+    return {
+      slotId,
+      name: `Macro ${slotId}`,
+      steps: [],
+    };
+  }
+
+  public async setMacroSlot(slot: MacroSlot): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 12; // KERF_SUBSYSTEM_MACROS
+    payload[1] = 2;  // SetMacroSlot
+    payload[2] = slot.slotId;
+    payload[3] = slot.steps.length;
+    let offset = 4;
+    for (let i = 0; i < slot.steps.length && offset + 3 <= 64; i++) {
+      payload[offset++] = slot.steps[i].action;
+      payload[offset++] = slot.steps[i].param & 0xff;
+      payload[offset++] = (slot.steps[i].param >> 8) & 0xff;
+    }
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async clearMacroSlot(slotId: number): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 12; // KERF_SUBSYSTEM_MACROS
+    payload[1] = 3;  // ClearMacroSlot
+    payload[2] = slotId;
     await this.transport.sendReport(0, payload);
   }
 

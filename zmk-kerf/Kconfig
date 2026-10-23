@@ -7,6 +7,13 @@ config ZMK_KERF
 	help
 	  Enables Kerf Protocol handling for lighting, battery, power, and profiles.
 
+config ZMK_KERF_MACROS
+	bool "Kerf Onboard Macros (&kmacro)"
+	default y
+	depends on ZMK_KERF
+	help
+	  Enables 16 slots x 64 steps onboard macro engine.
+
 config ZMK_KERF_USB_HID
 	bool "Kerf USB Vendor Raw HID Transport"
 	default y

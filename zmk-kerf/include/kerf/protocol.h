@@ -12,6 +12,7 @@
 
 #define KERF_SUBSYSTEM_CORE     10
 #define KERF_SUBSYSTEM_LIGHTING 11
+#define KERF_SUBSYSTEM_MACROS   12
 #define KERF_SUBSYSTEM_POWER    15
 
 enum kerf_error_code {

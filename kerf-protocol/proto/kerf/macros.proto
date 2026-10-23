@@ -1,0 +1,62 @@
+syntax = "proto3";
+package kerf.macros;
+
+enum MacroAction {
+  TAP = 0;
+  PRESS = 1;
+  RELEASE = 2;
+  DELAY = 3;
+}
+
+message MacroStep {
+  MacroAction action = 1;
+  uint32 param = 2; // Keycode or delay in ms
+}
+
+message MacroSlot {
+  uint32 slot_id = 1; // 0 - 15
+  string name = 2;
+  repeated MacroStep steps = 3;
+}
+
+message GetMacroSlotRequest {
+  uint32 slot_id = 1;
+}
+
+message GetMacroSlotResponse {
+  MacroSlot slot = 1;
+}
+
+message SetMacroSlotRequest {
+  MacroSlot slot = 1;
+}
+
+message SetMacroSlotResponse {}
+
+message ClearMacroSlotRequest {
+  uint32 slot_id = 1;
+}
+
+message ClearMacroSlotResponse {}
+
+message Request {
+  oneof command {
+    GetMacroSlotRequest   get_slot   = 1;
+    SetMacroSlotRequest   set_slot   = 2;
+    ClearMacroSlotRequest clear_slot = 3;
+  }
+}
+
+message Response {
+  oneof result {
+    GetMacroSlotResponse   get_slot   = 1;
+    SetMacroSlotResponse   set_slot   = 2;
+    ClearMacroSlotResponse clear_slot = 3;
+  }
+}
+
+message Notification {
+  oneof event {
+    uint32 slot_updated = 1;
+  }
+}

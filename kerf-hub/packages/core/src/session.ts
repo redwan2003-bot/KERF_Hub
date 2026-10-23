@@ -1,7 +1,7 @@
 import { StudioRpcClient } from './rpc/client';
 import { KerfClient } from './rpc/kerf-client';
 import { DeviceState, PhysicalKey, KeymapLayer } from './rpc/types';
-import { UnderglowConfig, BatledConfig, PowerConfig } from '@kerf/protocol';
+import { UnderglowConfig, BatledConfig, PowerConfig, MacroSlot, MAX_MACRO_SLOTS } from '@kerf/protocol';
 
 export function getDefaultLP63Keys(): PhysicalKey[] {
   const keys: PhysicalKey[] = [];
@@ -65,6 +65,7 @@ export interface ExtendedDeviceState extends DeviceState {
   underglow: UnderglowConfig;
   batled: BatledConfig;
   power: PowerConfig;
+  macros: MacroSlot[];
 }
 
 export class SessionManager {
@@ -102,6 +103,11 @@ export class SessionManager {
       idleTimeoutMs: 30000,
       deepSleepTimeoutMs: 900000,
     },
+    macros: new Array(MAX_MACRO_SLOTS).fill(null).map((_, i) => ({
+      slotId: i,
+      name: `Macro ${i}`,
+      steps: [],
+    })),
   };
   private listeners: Array<(state: ExtendedDeviceState) => void> = [];
 
@@ -180,6 +186,20 @@ export class SessionManager {
     this.state.power = { ...this.state.power, ...cfg };
     this.notify();
     await this.kerfClient.setPowerConfig(this.state.power);
+  }
+
+  public async updateMacroSlot(slot: MacroSlot): Promise<void> {
+    this.state.macros[slot.slotId] = slot;
+    this.notify();
+    await this.kerfClient.setMacroSlot(slot);
+  }
+
+  public async clearMacroSlot(slotId: number): Promise<void> {
+    if (this.state.macros[slotId]) {
+      this.state.macros[slotId].steps = [];
+      this.notify();
+      await this.kerfClient.clearMacroSlot(slotId);
+    }
   }
 
   public getState(): ExtendedDeviceState {

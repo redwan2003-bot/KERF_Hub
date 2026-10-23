@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { SessionManager, ExtendedDeviceState } from '@kerf/core';
-import { KeyboardRenderer, BehaviorPalette, LayerManager, UnlockModal, AvailableKey, LightingEditor, PowerEditor } from '@kerf/ui';
+import { KeyboardRenderer, BehaviorPalette, LayerManager, UnlockModal, AvailableKey, LightingEditor, PowerEditor, MacroEditor } from '@kerf/ui';
 import { Header } from './components/Header';
 import { StatusBar } from './components/StatusBar';
-import { Keyboard, Palette, Zap } from 'lucide-react';
+import { Keyboard, Palette, Zap, PlaySquare } from 'lucide-react';
 
 export const App: React.FC = () => {
   const session = useMemo(() => new SessionManager(), []);
   const [deviceState, setDeviceState] = useState<ExtendedDeviceState>(session.getState());
-  const [activeTab, setActiveTab] = useState<'keymap' | 'lighting' | 'power'>('keymap');
+  const [activeTab, setActiveTab] = useState<'keymap' | 'lighting' | 'power' | 'macros'>('keymap');
   const [selectedKeyIndex, setSelectedKeyIndex] = useState<number | null>(null);
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
 
@@ -100,6 +100,18 @@ export const App: React.FC = () => {
           <Zap className="w-4 h-4" />
           POWER & PERFORMANCE
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('macros')}
+          className={`flex items-center gap-2 text-xs font-mono font-medium py-3 border-b-2 transition-all ${
+            activeTab === 'macros'
+              ? 'border-amber-400 text-amber-300 font-bold'
+              : 'border-transparent text-zinc-400 hover:text-zinc-200'
+          }`}
+        >
+          <PlaySquare className="w-4 h-4" />
+          MACROS & RECORDER
+        </button>
       </nav>
 
       <main className="flex-1 overflow-auto flex flex-col items-center justify-start p-8 relative">
@@ -152,6 +164,15 @@ export const App: React.FC = () => {
           <PowerEditor
             power={deviceState.power}
             onChangePower={(cfg) => session.updatePower(cfg)}
+            disabled={deviceState.locked && deviceState.connected}
+          />
+        )}
+
+        {activeTab === 'macros' && (
+          <MacroEditor
+            slots={deviceState.macros}
+            onSaveSlot={(slot) => session.updateMacroSlot(slot)}
+            onClearSlot={(slotId) => session.clearMacroSlot(slotId)}
             disabled={deviceState.locked && deviceState.connected}
           />
         )}

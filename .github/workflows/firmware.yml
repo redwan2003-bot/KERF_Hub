@@ -26,27 +26,29 @@ jobs:
         continue-on-error: true
         with:
           path: |
-            modules/
-            tools/
-            zephyr/
-            bootloader/
-            zmk/
-          key: ${{ runner.os }}-zmk-${{ hashFiles('**/west.yml', '**/build.yaml') }}
+            zmk-config-byrantk_lp63/modules/
+            zmk-config-byrantk_lp63/tools/
+            zmk-config-byrantk_lp63/zephyr/
+            zmk-config-byrantk_lp63/bootloader/
+            zmk-config-byrantk_lp63/zmk/
+          key: ${{ runner.os }}-zmk-${{ hashFiles('zmk-config-byrantk_lp63/**/west.yml') }}
           restore-keys: |
             ${{ runner.os }}-zmk-
 
       - name: Initialize West Workspace
+        working-directory: zmk-config-byrantk_lp63
         run: |
-          west init -l zmk-config-byrantk_lp63/config || west init -l zmk-config-byrantk_lp63
+          west init -l config
           west update
           west zephyr-export
 
       - name: Build LP63 Firmware
+        working-directory: zmk-config-byrantk_lp63
         run: |
-          west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=byrantk_lp63 -DZMK_CONFIG="$(pwd)/zmk-config-byrantk_lp63/config"
+          west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=byrantk_lp63 -DZMK_CONFIG="$(pwd)/config"
 
       - name: Archive UF2 Artifact
         uses: actions/upload-artifact@v4
         with:
           name: byrantk_lp63-nice_nano_v2-zmk
-          path: build/zephyr/zmk.uf2
+          path: zmk-config-byrantk_lp63/build/zephyr/zmk.uf2

@@ -1,0 +1,22 @@
+[package]
+name = "kerf-hub"
+version = "1.0.0"
+description = "Kerf Hub Configurator for ByranTK LP63 & Kerf Peripherals"
+authors = ["Redwan / Kerf Keeb"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0.0", features = [] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+hidapi = "2.6"
+serialport = "4.5"
+btleplug = { version = "0.11", optional = true }
+thiserror = "1.0"
+
+[features]
+default = []
+bluetooth = ["dep:btleplug"]

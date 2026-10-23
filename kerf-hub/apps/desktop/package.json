@@ -2,8 +2,12 @@
   "name": "@kerf/desktop",
   "version": "1.0.0",
   "private": true,
-  "description": "Tauri 2 desktop wrapper placeholder (Phase 6)",
+  "description": "Tauri 2 cross-platform desktop application for Kerf Hub",
   "scripts": {
-    "build": "echo 'Desktop build placeholder for Phase 6'"
+    "dev": "tauri dev",
+    "build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.0.0"
   }
 }

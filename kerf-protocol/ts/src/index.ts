@@ -1,6 +1,6 @@
 /**
  * @kerf/protocol — Protocol buffer TypeScript definitions and codecs
- * Corresponds to kerf.proto, core.proto, lighting.proto, power.proto, macros.proto, profiles.proto, display.proto
+ * Corresponds to kerf.proto, core.proto, lighting.proto, power.proto, macros.proto, profiles.proto, display.proto, pointer.proto
  */
 
 export const PROTOCOL_VERSION = 1;
@@ -145,6 +145,35 @@ export interface LiveDataPushRequest {
   volumePct?: number;
 }
 
+export enum PollingRate {
+  RATE_125HZ = 0,
+  RATE_250HZ = 1,
+  RATE_500HZ = 2,
+  RATE_1000HZ = 3,
+}
+
+export enum LiftOffDistance {
+  LOD_1MM = 0,
+  LOD_2MM = 1,
+}
+
+export interface DpiStage {
+  stageId: number;
+  dpiX: number;
+  dpiY: number;
+  colorHex: number;
+}
+
+export interface PointerConfig {
+  activeStage: number;
+  stages: DpiStage[];
+  pollingRate: PollingRate;
+  lod: LiftOffDistance;
+  motionSync: boolean;
+  rippleControl: boolean;
+  angleSnapping: boolean;
+}
+
 export interface ProfileMetadata {
   profileId: number; // 0, 1, 2
   name: string;
@@ -227,7 +256,7 @@ export function textToMacroSteps(text: string): MacroStep[] {
 
 export interface KerfRequest {
   requestId: number;
-  subsystem: 'core' | 'lighting' | 'power' | 'macros' | 'profiles' | 'display';
+  subsystem: 'core' | 'lighting' | 'power' | 'macros' | 'profiles' | 'display' | 'pointer';
   command: string;
   payload?: any;
 }
@@ -235,7 +264,7 @@ export interface KerfRequest {
 export interface KerfResponse {
   requestId: number;
   error: ErrorCode;
-  subsystem?: 'core' | 'lighting' | 'power' | 'macros' | 'profiles' | 'display';
+  subsystem?: 'core' | 'lighting' | 'power' | 'macros' | 'profiles' | 'display' | 'pointer';
   payload?: any;
 }
 

@@ -11,4 +11,5 @@ export * from './components/MacroEditor';
 export * from './components/ProfileManager';
 export * from './components/FirmwareUpdater';
 export * from './components/DisplayEditor';
+export * from './components/MouseEditor';
 

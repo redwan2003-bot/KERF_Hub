@@ -1,0 +1,29 @@
+{
+  "modelId": "kerf-mouse",
+  "name": "Kerf Precision Mouse",
+  "usb": {
+    "vid": "0x1D50",
+    "pid": "0x6160"
+  },
+  "capabilities": [
+    "POINTER",
+    "BATLED",
+    "MACROS",
+    "PROFILES"
+  ],
+  "sensor": {
+    "model": "PAW3395",
+    "maxDpi": 26000,
+    "minDpi": 50,
+    "dpiStep": 50,
+    "maxPollingRate": 1000
+  },
+  "buttons": {
+    "count": 6,
+    "labels": ["Left", "Right", "Middle", "Back", "Forward", "DPI Switch"]
+  },
+  "firmware": {
+    "bootloader": "adafruit-uf2",
+    "uf2Family": "0xADA52840"
+  }
+}

@@ -3,19 +3,23 @@
 
 mod commands;
 mod transport;
+mod telemetry;
 
 use commands::*;
 use std::sync::Mutex;
+use telemetry::TelemetryManager;
 use transport::hid::HidManager;
 use transport::serial::SerialManager;
 
 fn main() {
   let hid_manager = HidManager::new().expect("Failed to initialize HID API");
   let serial_manager = SerialManager::new();
+  let telemetry_manager = TelemetryManager::new();
 
   let app_state = AppState {
     hid: Mutex::new(hid_manager),
     serial: Mutex::new(serial_manager),
+    telemetry: Mutex::new(telemetry_manager),
   };
 
   tauri::Builder::default()
@@ -31,6 +35,7 @@ fn main() {
       kerf_write_serial_bytes,
       kerf_read_serial_bytes,
       kerf_close_serial_port,
+      kerf_get_telemetry,
     ])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");

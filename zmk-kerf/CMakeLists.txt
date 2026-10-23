@@ -13,6 +13,7 @@ if(CONFIG_ZMK_KERF)
     src/rpc/display_service.c
     src/display/kerf_status_screen.c
     src/rpc/power_service.c
+    src/rpc/pointer_service.c
     src/behaviors/behavior_kmacro.c
   )
 

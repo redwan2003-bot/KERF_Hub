@@ -72,6 +72,9 @@ static void on_hid_int_out_ready(const struct device *dev) {
 	case KERF_SUBSYSTEM_POWER:
 		err = kerf_handle_power_request(cmd, &rx_buf[2], bytes_read - 2, &tx_buf[2], &out_len);
 		break;
+	case KERF_SUBSYSTEM_POINTER:
+		err = kerf_handle_pointer_request(cmd, &rx_buf[2], bytes_read - 2, &tx_buf[2], &out_len);
+		break;
 	}
 
 	tx_buf[0] = subsystem;

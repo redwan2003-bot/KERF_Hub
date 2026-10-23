@@ -1,0 +1,31 @@
+{
+  "modelId": "kerf-macropad",
+  "name": "Kerf Pad 16",
+  "usb": {
+    "vid": "0x1D50",
+    "pid": "0x615F"
+  },
+  "capabilities": [
+    "KEYMAP",
+    "ENCODER",
+    "LIGHTING_UNDERGLOW",
+    "BATLED",
+    "MACROS",
+    "PROFILES"
+  ],
+  "lighting": {
+    "perKeyPixels": 16,
+    "underglowPixels": 4,
+    "batledPixel": 1
+  },
+  "firmware": {
+    "bootloader": "adafruit-uf2",
+    "uf2Family": "0xADA52840"
+  },
+  "matrix": {
+    "rows": 4,
+    "columns": 4,
+    "keys": 16,
+    "encoders": 2
+  }
+}

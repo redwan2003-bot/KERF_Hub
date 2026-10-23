@@ -9,6 +9,9 @@ import {
   WidgetConfig,
   AnimationConfig,
   LiveDataPushRequest,
+  PointerConfig,
+  PollingRate,
+  LiftOffDistance,
   DISPLAY_BYTES_PER_FRAME,
   DISPLAY_CHUNK_SIZE,
   DeviceInfo,
@@ -277,6 +280,37 @@ export class KerfClient {
     payload[2] = data.cpuTempC ?? 0;
     payload[3] = data.gpuTempC ?? 0;
     payload[4] = data.volumePct ?? 0;
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async getPointerConfig(): Promise<PointerConfig> {
+    return {
+      activeStage: 1,
+      stages: [
+        { stageId: 0, dpiX: 400, dpiY: 400, colorHex: 0xff0000 },
+        { stageId: 1, dpiX: 800, dpiY: 800, colorHex: 0x00ff00 },
+        { stageId: 2, dpiX: 1600, dpiY: 1600, colorHex: 0x0000ff },
+        { stageId: 3, dpiX: 3200, dpiY: 3200, colorHex: 0xffff00 },
+      ],
+      pollingRate: PollingRate.RATE_1000HZ,
+      lod: LiftOffDistance.LOD_1MM,
+      motionSync: true,
+      rippleControl: false,
+      angleSnapping: false,
+    };
+  }
+
+  public async setPointerConfig(cfg: PointerConfig): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 16; // KERF_SUBSYSTEM_POINTER
+    payload[1] = 2;  // SetPointerConfig
+    payload[2] = cfg.activeStage;
+    payload[3] = cfg.pollingRate;
+    payload[4] = cfg.lod;
+    payload[5] = cfg.motionSync ? 1 : 0;
+    payload[6] = cfg.rippleControl ? 1 : 0;
+    payload[7] = cfg.angleSnapping ? 1 : 0;
     await this.transport.sendReport(0, payload);
   }
 

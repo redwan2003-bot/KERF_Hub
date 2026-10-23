@@ -1,0 +1,57 @@
+syntax = "proto3";
+package kerf.pointer;
+
+enum PollingRate {
+  RATE_125HZ = 0;
+  RATE_250HZ = 1;
+  RATE_500HZ = 2;
+  RATE_1000HZ = 3;
+}
+
+enum LiftOffDistance {
+  LOD_1MM = 0;
+  LOD_2MM = 1;
+}
+
+message DpiStage {
+  uint32 stage_id = 1;
+  uint32 dpi_x = 2;
+  uint32 dpi_y = 3;
+  uint32 color_hex = 4;
+}
+
+message PointerConfig {
+  uint32 active_stage = 1;
+  repeated DpiStage stages = 2;
+  PollingRate polling_rate = 3;
+  LiftOffDistance lod = 4;
+  bool motion_sync = 5;
+  bool ripple_control = 6;
+  bool angle_snapping = 7;
+}
+
+message GetPointerConfigRequest {}
+message GetPointerConfigResponse {
+  PointerConfig config = 1;
+}
+
+message SetPointerConfigRequest {
+  PointerConfig config = 1;
+}
+message SetPointerConfigResponse {
+  bool success = 1;
+}
+
+message Request {
+  oneof command {
+    GetPointerConfigRequest get_config = 1;
+    SetPointerConfigRequest set_config = 2;
+  }
+}
+
+message Response {
+  oneof result {
+    GetPointerConfigResponse get_config = 1;
+    SetPointerConfigResponse set_config = 2;
+  }
+}

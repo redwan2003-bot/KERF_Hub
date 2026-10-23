@@ -49,6 +49,9 @@ static ssize_t write_kerf_char(struct bt_conn *conn, const struct bt_gatt_attr *
 	case KERF_SUBSYSTEM_POWER:
 		err = kerf_handle_power_request(cmd, &bytes[2], len - 2, out, &out_len);
 		break;
+	case KERF_SUBSYSTEM_POINTER:
+		err = kerf_handle_pointer_request(cmd, &bytes[2], len - 2, out, &out_len);
+		break;
 	}
 
 	return len;

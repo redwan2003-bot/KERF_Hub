@@ -12,15 +12,16 @@ import {
   ProfileManager,
   FirmwareUpdater,
   DisplayEditor,
+  MouseEditor,
 } from '@kerf/ui';
 import { Header } from './components/Header';
 import { StatusBar } from './components/StatusBar';
-import { Keyboard, Palette, Zap, PlaySquare, Layers, Cpu, Monitor } from 'lucide-react';
+import { Keyboard, Palette, Zap, PlaySquare, Layers, Cpu, Monitor, Mouse } from 'lucide-react';
 
 export const App: React.FC = () => {
   const session = useMemo(() => new SessionManager(), []);
   const [deviceState, setDeviceState] = useState<ExtendedDeviceState>(session.getState());
-  const [activeTab, setActiveTab] = useState<'keymap' | 'lighting' | 'power' | 'macros' | 'profiles' | 'display' | 'firmware'>('keymap');
+  const [activeTab, setActiveTab] = useState<'keymap' | 'lighting' | 'power' | 'macros' | 'profiles' | 'display' | 'mouse' | 'firmware'>('keymap');
   const [selectedKeyIndex, setSelectedKeyIndex] = useState<number | null>(null);
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
 
@@ -81,6 +82,8 @@ export const App: React.FC = () => {
         connected={deviceState.connected}
         locked={deviceState.locked}
         deviceName={deviceState.name}
+        modelId={deviceState.modelId}
+        onSelectDevice={(id) => session.selectDeviceModel(id)}
         onConnect={handleConnect}
         onDisconnect={handleDisconnect}
         onUnlockClick={() => setIsUnlockModalOpen(true)}
@@ -160,6 +163,20 @@ export const App: React.FC = () => {
           <Monitor className="w-4 h-4" />
           DISPLAY & NICE!VIEW
         </button>
+        {deviceState.modelId === 'kerf-mouse' && (
+          <button
+            type="button"
+            onClick={() => setActiveTab('mouse')}
+            className={`flex items-center gap-2 text-xs font-mono font-medium py-3 border-b-2 transition-all ${
+              activeTab === 'mouse'
+                ? 'border-amber-400 text-amber-300 font-bold'
+                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+            }`}
+          >
+            <Mouse className="w-4 h-4" />
+            MOUSE & SENSOR
+          </button>
+        )}
         <button
           type="button"
           onClick={() => setActiveTab('firmware')}
@@ -254,6 +271,14 @@ export const App: React.FC = () => {
             config={deviceState.display}
             onChangeConfig={(cfg) => session.updateDisplayLayout(cfg)}
             onUploadFrame={(idx, bytes, onProgress) => session.uploadDisplayFrame(idx, bytes, onProgress)}
+            disabled={deviceState.locked && deviceState.connected}
+          />
+        )}
+
+        {activeTab === 'mouse' && (
+          <MouseEditor
+            config={deviceState.pointer}
+            onChangeConfig={(cfg) => session.updatePointerConfig(cfg)}
             disabled={deviceState.locked && deviceState.connected}
           />
         )}

@@ -15,6 +15,9 @@ import {
   DISPLAY_BYTES_PER_FRAME,
   MAX_DISPLAY_FRAMES,
   DISPLAY_CHUNK_SIZE,
+  PollingRate,
+  LiftOffDistance,
+  PointerConfig,
   validateKerfProfileFile,
   KerfProfileFile,
 } from './index';
@@ -143,5 +146,26 @@ describe('Kerf Protocol Codecs & Macros', () => {
     // Chunks needed for full frame transfer
     const chunksNeeded = Math.ceil(DISPLAY_BYTES_PER_FRAME / DISPLAY_CHUNK_SIZE);
     expect(chunksNeeded).toBe(25); // 24 * 56 + 16 = 1360 bytes
+  });
+
+  it('validates pointer configuration and DPI stage parameters', () => {
+    const mouseConfig: PointerConfig = {
+      activeStage: 1,
+      stages: [
+        { stageId: 0, dpiX: 400, dpiY: 400, colorHex: 0xff0000 },
+        { stageId: 1, dpiX: 800, dpiY: 800, colorHex: 0x00ff00 },
+        { stageId: 2, dpiX: 1600, dpiY: 1600, colorHex: 0x0000ff },
+      ],
+      pollingRate: PollingRate.RATE_1000HZ,
+      lod: LiftOffDistance.LOD_1MM,
+      motionSync: true,
+      rippleControl: false,
+      angleSnapping: false,
+    };
+
+    expect(mouseConfig.stages.length).toBe(3);
+    expect(mouseConfig.pollingRate).toBe(PollingRate.RATE_1000HZ);
+    expect(mouseConfig.lod).toBe(LiftOffDistance.LOD_1MM);
+    expect(mouseConfig.stages[1].dpiX).toBe(800);
   });
 });

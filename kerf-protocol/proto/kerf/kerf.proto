@@ -7,6 +7,7 @@ import "kerf/macros.proto";
 import "kerf/profiles.proto";
 import "kerf/display.proto";
 import "kerf/power.proto";
+import "kerf/pointer.proto";
 
 enum ErrorCode {
   OK = 0;
@@ -26,6 +27,7 @@ message Request {
     profiles.Request profiles = 13;
     display.Request  display  = 14;
     power.Request    power    = 15;
+    pointer.Request  pointer  = 16;
   }
 }
 
@@ -39,6 +41,7 @@ message Response {
     profiles.Response profiles = 13;
     display.Response  display  = 14;
     power.Response    power    = 15;
+    pointer.Response  pointer  = 16;
   }
 }
 
@@ -50,5 +53,6 @@ message Notification {
     profiles.Notification profiles = 13;
     display.Notification  display  = 14;
     power.Notification    power    = 15;
+    pointer.Notification  pointer  = 16;
   }
 }

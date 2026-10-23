@@ -1,11 +1,13 @@
 use crate::transport::hid::{HidManager, NativeHidDeviceInfo};
 use crate::transport::serial::{NativeSerialPortInfo, SerialManager};
+use crate::telemetry::{SystemTelemetry, TelemetryManager};
 use std::sync::Mutex;
 use tauri::State;
 
 pub struct AppState {
   pub hid: Mutex<HidManager>,
   pub serial: Mutex<SerialManager>,
+  pub telemetry: Mutex<TelemetryManager>,
 }
 
 #[tauri::command]
@@ -66,4 +68,10 @@ pub fn kerf_read_serial_bytes(state: State<'_, AppState>) -> Result<Vec<u8>, Str
 pub fn kerf_close_serial_port(state: State<'_, AppState>) -> Result<(), String> {
   let serial = state.serial.lock().map_err(|e| e.to_string())?;
   serial.close_port()
+}
+
+#[tauri::command]
+pub fn kerf_get_telemetry(state: State<'_, AppState>) -> Result<SystemTelemetry, String> {
+  let telemetry = state.telemetry.lock().map_err(|e| e.to_string())?;
+  Ok(telemetry.sample_telemetry())
 }

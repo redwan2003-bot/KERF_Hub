@@ -12,6 +12,9 @@ import {
   KerfProfileFile,
   validateKerfProfileFile,
   WidgetConfig,
+  PointerConfig,
+  PollingRate,
+  LiftOffDistance,
 } from '@kerf/protocol';
 
 export function getDefaultLP63Keys(): PhysicalKey[] {
@@ -80,6 +83,7 @@ export interface ExtendedDeviceState extends DeviceState {
   activeProfileId: number;
   profiles: ProfileData[];
   display: WidgetConfig;
+  pointer: PointerConfig;
 }
 
 export class SessionManager {
@@ -162,6 +166,20 @@ export class SessionManager {
       invertColors: false,
       rotate180: false,
       screenOffOnIdle: true,
+    },
+    pointer: {
+      activeStage: 1,
+      stages: [
+        { stageId: 0, dpiX: 400, dpiY: 400, colorHex: 0xff0000 },
+        { stageId: 1, dpiX: 800, dpiY: 800, colorHex: 0x00ff00 },
+        { stageId: 2, dpiX: 1600, dpiY: 1600, colorHex: 0x0000ff },
+        { stageId: 3, dpiX: 3200, dpiY: 3200, colorHex: 0xffff00 },
+      ],
+      pollingRate: PollingRate.RATE_1000HZ,
+      lod: LiftOffDistance.LOD_1MM,
+      motionSync: true,
+      rippleControl: false,
+      angleSnapping: false,
     },
   };
   private listeners: Array<(state: ExtendedDeviceState) => void> = [];
@@ -341,6 +359,24 @@ export class SessionManager {
     onProgress?: (pct: number) => void,
   ): Promise<void> {
     await this.kerfClient.uploadDisplayImage(frameIdx, frameBytes, onProgress);
+  }
+
+  public async updatePointerConfig(cfg: Partial<PointerConfig>): Promise<void> {
+    this.state.pointer = { ...this.state.pointer, ...cfg };
+    this.notify();
+    await this.kerfClient.setPointerConfig(this.state.pointer);
+  }
+
+  public selectDeviceModel(modelId: 'kerf-lp63' | 'kerf-macropad' | 'kerf-mouse'): void {
+    this.state.modelId = modelId;
+    if (modelId === 'kerf-lp63') {
+      this.state.name = 'kerf_keeb LP63';
+    } else if (modelId === 'kerf-macropad') {
+      this.state.name = 'Kerf Pad 16';
+    } else if (modelId === 'kerf-mouse') {
+      this.state.name = 'Kerf Precision Mouse';
+    }
+    this.notify();
   }
 
   public getState(): ExtendedDeviceState {

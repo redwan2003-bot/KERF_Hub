@@ -5,6 +5,8 @@ export interface HeaderProps {
   connected: boolean;
   locked: boolean;
   deviceName: string;
+  modelId: string;
+  onSelectDevice: (modelId: 'kerf-lp63' | 'kerf-macropad' | 'kerf-mouse') => void;
   onConnect: () => void;
   onDisconnect: () => void;
   onUnlockClick: () => void;
@@ -14,6 +16,8 @@ export const Header: React.FC<HeaderProps> = ({
   connected,
   locked,
   deviceName,
+  modelId,
+  onSelectDevice,
   onConnect,
   onDisconnect,
   onUnlockClick,
@@ -28,7 +32,20 @@ export const Header: React.FC<HeaderProps> = ({
           <h1 className="text-sm font-bold tracking-wide text-zinc-100 flex items-center gap-2">
             KERF HUB <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 font-mono">v1.0-alpha</span>
           </h1>
-          <p className="text-[11px] font-mono text-zinc-400">{connected ? deviceName : 'No device connected'}</p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <select
+              value={modelId}
+              onChange={(e) => onSelectDevice(e.target.value as any)}
+              className="bg-zinc-800 border border-zinc-700 text-[11px] font-mono text-zinc-300 rounded px-1.5 py-0.5 focus:outline-none focus:border-amber-500"
+            >
+              <option value="kerf-lp63">kerf_keeb LP63 (Keyboard)</option>
+              <option value="kerf-macropad">Kerf Pad 16 (Macro Pad)</option>
+              <option value="kerf-mouse">Kerf Precision (Mouse)</option>
+            </select>
+            <span className="text-[10px] font-mono text-zinc-500">
+              {connected ? `• ${deviceName}` : '• Ready'}
+            </span>
+          </div>
         </div>
       </div>
 

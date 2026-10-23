@@ -4,24 +4,22 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
-  build-tauri:
-    permissions:
-      contents: write
+  release-desktop:
     strategy:
       fail-fast: false
       matrix:
         include:
           - platform: 'windows-latest'
-            args: '--target x86_64-pc-windows-msvc'
-          - platform: 'macos-latest'
-            args: '--target aarch64-apple-darwin'
-
+            args: ''
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -33,30 +31,25 @@ jobs:
         with:
           version: 9
 
-      - name: Install Rust toolchain
+      - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
-        with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || 'x86_64-pc-windows-msvc' }}
 
-      - name: Install dependencies
-        run: |
-          cd kerf-hub
-          pnpm install
+      - name: Install Monorepo Dependencies
+        run: pnpm install
+        working-directory: kerf-hub
 
-      - name: Build web application
-        run: |
-          cd kerf-hub
-          pnpm --filter @kerf/web build
+      - name: Build Web App Assets
+        run: pnpm --filter @kerf/web build
+        working-directory: kerf-hub
 
       - name: Build Tauri Desktop App
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: __CURRENT_TAG__
-          releaseName: 'Kerf Hub v__VERSION__'
-          releaseBody: 'See docs/USER_GUIDE.md for hardware details and release notes.'
-          releaseDraft: true
+          projectPath: ./kerf-hub/apps/desktop
+          tagName: ${{ github.ref_name }}
+          releaseName: 'KERF Hub ${{ github.ref_name }}'
+          releaseBody: 'Production release for KERF Hub desktop application.'
+          releaseDraft: false
           prerelease: false
-          projectPath: kerf-hub/apps/desktop
-          args: ${{ matrix.args }}

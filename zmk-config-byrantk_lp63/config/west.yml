@@ -2,12 +2,12 @@ manifest:
   remotes:
     - name: zmkfirmware
       url-base: https://github.com/zmkfirmware
+  defaults:
+    remote: zmkfirmware
   projects:
     - name: zmk
       remote: zmkfirmware
-      revision: 753d8b467125fe860eec05ee71cb7ebefa08fba6
-      import: app/nano.yml
-    - name: zmk-kerf
-      path: modules/zmk-kerf
+      revision: main
+      import: app/west.yml
   self:
     path: config

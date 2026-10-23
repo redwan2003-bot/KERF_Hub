@@ -2,22 +2,51 @@ name: Firmware Matrix CI
 
 on:
   push:
-    branches: [ main, 'feat/**' ]
+    paths:
+      - 'zmk-config-byrantk_lp63/**'
+      - '.github/workflows/firmware.yml'
   pull_request:
-    branches: [ main ]
+    paths:
+      - 'zmk-config-byrantk_lp63/**'
+      - '.github/workflows/firmware.yml'
   workflow_dispatch:
 
 jobs:
-  build-ble:
-    name: Build BLE Targets
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@753d8b467125fe860eec05ee71cb7ebefa08fba6
-    with:
-      build_matrix_path: 'zmk-config-byrantk_lp63/build.yaml'
-      config_path: 'zmk-config-byrantk_lp63/config'
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: zmkfirmware/zmk-build-arm:stable
+    name: Build ByranTK LP63 Firmware
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  build-esb:
-    name: Build ESB Targets
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@753d8b467125fe860eec05ee71cb7ebefa08fba6
-    with:
-      build_matrix_path: 'zmk-config-esb/build.yaml'
-      config_path: 'zmk-config-esb/config'
+      - name: Cache West modules
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            modules/
+            tools/
+            zephyr/
+            bootloader/
+            zmk/
+          key: ${{ runner.os }}-zmk-${{ hashFiles('**/west.yml', '**/build.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-zmk-
+
+      - name: Initialize West Workspace
+        run: |
+          west init -l zmk-config-byrantk_lp63/config || west init -l zmk-config-byrantk_lp63
+          west update
+          west zephyr-export
+
+      - name: Build LP63 Firmware
+        run: |
+          west build -s zmk/app -b nice_nano_v2 -- -DSHIELD=byrantk_lp63 -DZMK_CONFIG="$(pwd)/zmk-config-byrantk_lp63/config"
+
+      - name: Archive UF2 Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: byrantk_lp63-nice_nano_v2-zmk
+          path: build/zephyr/zmk.uf2

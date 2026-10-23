@@ -1,0 +1,68 @@
+syntax = "proto3";
+package kerf.profiles;
+
+import "kerf/lighting.proto";
+import "kerf/power.proto";
+import "kerf/macros.proto";
+
+message ProfileMetadata {
+  uint32 profile_id = 1;
+  string name = 2;
+  bool active = 3;
+}
+
+message ProfileData {
+  uint32 profile_id = 1;
+  string name = 2;
+  lighting.UnderglowConfig underglow = 3;
+  lighting.BatledConfig batled = 4;
+  power.PowerConfig power = 5;
+  repeated macros.MacroSlot macros = 6;
+  bytes keymap_snapshot = 7;
+}
+
+message ListProfilesRequest {}
+message ListProfilesResponse {
+  uint32 active_profile_id = 1;
+  repeated ProfileMetadata profiles = 2;
+}
+
+message GetProfileRequest {
+  uint32 profile_id = 1;
+}
+message GetProfileResponse {
+  ProfileData profile = 1;
+}
+
+message SaveProfileRequest {
+  ProfileData profile = 1;
+}
+message SaveProfileResponse {
+  bool success = 1;
+}
+
+message ActivateProfileRequest {
+  uint32 profile_id = 1;
+}
+message ActivateProfileResponse {
+  bool success = 1;
+  uint32 active_profile_id = 2;
+}
+
+message Request {
+  oneof command {
+    ListProfilesRequest     list = 1;
+    GetProfileRequest      get = 2;
+    SaveProfileRequest     save = 3;
+    ActivateProfileRequest activate = 4;
+  }
+}
+
+message Response {
+  oneof result {
+    ListProfilesResponse     list = 1;
+    GetProfileResponse      get = 2;
+    SaveProfileResponse     save = 3;
+    ActivateProfileResponse activate = 4;
+  }
+}

@@ -8,4 +8,6 @@ export * from './components/UnlockModal';
 export * from './components/LightingEditor';
 export * from './components/PowerEditor';
 export * from './components/MacroEditor';
+export * from './components/ProfileManager';
+export * from './components/FirmwareUpdater';
 

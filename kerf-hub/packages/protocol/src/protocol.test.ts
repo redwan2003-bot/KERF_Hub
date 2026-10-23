@@ -9,6 +9,9 @@ import {
   PROTOCOL_VERSION,
   MAX_MACRO_STEPS,
   MAX_MACRO_SLOTS,
+  MAX_PROFILES,
+  validateKerfProfileFile,
+  KerfProfileFile,
 } from './index';
 
 describe('Kerf Protocol Codecs & Macros', () => {
@@ -74,5 +77,55 @@ describe('Kerf Protocol Codecs & Macros', () => {
     expect(decoded.requestId).toBe(10);
     expect(decoded.error).toBe(ErrorCode.OK);
     expect(decoded.subsystem).toBe('macros');
+  });
+
+  it('validates a valid .kerfprofile JSON file schema', () => {
+    const validProfile: KerfProfileFile = {
+      format: 'kerfprofile',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      modelId: 'kerf-lp63',
+      profileName: 'Gaming Speed',
+      data: {
+        name: 'Gaming Speed',
+        underglow: {
+          on: true,
+          hue: 0,
+          saturation: 100,
+          brightness: 100,
+          effect: 0,
+          speed: 1,
+          autoOffIdle: true,
+          autoOffUsb: false,
+        },
+        batled: {
+          brightness: 100,
+          lowBrightness: 20,
+          tapMs: 1000,
+          maxHoldMs: 10000,
+          lowPercent: 10,
+          repeatMin: 5,
+        },
+        power: {
+          debouncePressMs: 1,
+          debounceReleaseMs: 2,
+          idleTimeoutMs: 30000,
+          deepSleepTimeoutMs: 900000,
+        },
+        macros: [],
+      },
+    };
+
+    const validated = validateKerfProfileFile(validProfile);
+    expect(validated.profileName).toBe('Gaming Speed');
+    expect(validated.data.power.debouncePressMs).toBe(1);
+    expect(MAX_PROFILES).toBe(3);
+  });
+
+  it('rejects invalid .kerfprofile format or payload', () => {
+    expect(() => validateKerfProfileFile(null)).toThrow();
+    expect(() => validateKerfProfileFile({ format: 'invalid', version: 1, data: {} })).toThrow();
+    expect(() => validateKerfProfileFile({ format: 'kerfprofile', version: 0, data: {} })).toThrow();
+    expect(() => validateKerfProfileFile({ format: 'kerfprofile', version: 1 })).toThrow();
   });
 });

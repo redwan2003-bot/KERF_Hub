@@ -1,6 +1,6 @@
 /**
  * @kerf/protocol — Protocol buffer TypeScript definitions and codecs
- * Corresponds to kerf.proto, core.proto, lighting.proto, power.proto (protocol_version: 1)
+ * Corresponds to kerf.proto, core.proto, lighting.proto, power.proto, macros.proto, profiles.proto
  */
 
 export const PROTOCOL_VERSION = 1;
@@ -99,6 +99,52 @@ export interface MacroSlot {
 export const MAX_MACRO_SLOTS = 16;
 export const MAX_MACRO_STEPS = 64;
 
+export const MAX_PROFILES = 3;
+
+export interface ProfileMetadata {
+  profileId: number; // 0, 1, 2
+  name: string;
+  active: boolean;
+}
+
+export interface ProfileData {
+  profileId: number;
+  name: string;
+  underglow: UnderglowConfig;
+  batled: BatledConfig;
+  power: PowerConfig;
+  macros: MacroSlot[];
+  keymapSnapshot?: any;
+}
+
+export interface KerfProfileFile {
+  format: 'kerfprofile';
+  version: number;
+  exportedAt: string;
+  modelId: string;
+  profileName: string;
+  data: Omit<ProfileData, 'profileId'>;
+}
+
+/**
+ * Validates a parsed JSON object as a valid KerfProfileFile schema.
+ */
+export function validateKerfProfileFile(obj: any): KerfProfileFile {
+  if (!obj || typeof obj !== 'object') {
+    throw new Error('Invalid profile file: expected a JSON object');
+  }
+  if (obj.format !== 'kerfprofile') {
+    throw new Error(`Invalid format identifier: "${obj.format}". Expected "kerfprofile"`);
+  }
+  if (typeof obj.version !== 'number' || obj.version < 1) {
+    throw new Error(`Unsupported profile version: ${obj.version}`);
+  }
+  if (!obj.data || typeof obj.data !== 'object') {
+    throw new Error('Missing profile data payload');
+  }
+  return obj as KerfProfileFile;
+}
+
 /**
  * Converts a text string into an array of sequential TAP macro steps.
  */
@@ -137,7 +183,7 @@ export function textToMacroSteps(text: string): MacroStep[] {
 
 export interface KerfRequest {
   requestId: number;
-  subsystem: 'core' | 'lighting' | 'power' | 'macros';
+  subsystem: 'core' | 'lighting' | 'power' | 'macros' | 'profiles';
   command: string;
   payload?: any;
 }
@@ -145,7 +191,7 @@ export interface KerfRequest {
 export interface KerfResponse {
   requestId: number;
   error: ErrorCode;
-  subsystem?: 'core' | 'lighting' | 'power' | 'macros';
+  subsystem?: 'core' | 'lighting' | 'power' | 'macros' | 'profiles';
   payload?: any;
 }
 

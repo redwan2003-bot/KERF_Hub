@@ -63,6 +63,9 @@ static void on_hid_int_out_ready(const struct device *dev) {
 	case KERF_SUBSYSTEM_MACROS:
 		err = kerf_handle_macros_request(cmd, &rx_buf[2], bytes_read - 2, &tx_buf[2], &out_len);
 		break;
+	case KERF_SUBSYSTEM_PROFILES:
+		err = kerf_handle_profiles_request(cmd, &rx_buf[2], bytes_read - 2, &tx_buf[2], &out_len);
+		break;
 	case KERF_SUBSYSTEM_POWER:
 		err = kerf_handle_power_request(cmd, &rx_buf[2], bytes_read - 2, &tx_buf[2], &out_len);
 		break;

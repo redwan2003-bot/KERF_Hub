@@ -1,14 +1,25 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { SessionManager, ExtendedDeviceState } from '@kerf/core';
-import { KeyboardRenderer, BehaviorPalette, LayerManager, UnlockModal, AvailableKey, LightingEditor, PowerEditor, MacroEditor } from '@kerf/ui';
+import {
+  KeyboardRenderer,
+  BehaviorPalette,
+  LayerManager,
+  UnlockModal,
+  AvailableKey,
+  LightingEditor,
+  PowerEditor,
+  MacroEditor,
+  ProfileManager,
+  FirmwareUpdater,
+} from '@kerf/ui';
 import { Header } from './components/Header';
 import { StatusBar } from './components/StatusBar';
-import { Keyboard, Palette, Zap, PlaySquare } from 'lucide-react';
+import { Keyboard, Palette, Zap, PlaySquare, Layers, Cpu } from 'lucide-react';
 
 export const App: React.FC = () => {
   const session = useMemo(() => new SessionManager(), []);
   const [deviceState, setDeviceState] = useState<ExtendedDeviceState>(session.getState());
-  const [activeTab, setActiveTab] = useState<'keymap' | 'lighting' | 'power' | 'macros'>('keymap');
+  const [activeTab, setActiveTab] = useState<'keymap' | 'lighting' | 'power' | 'macros' | 'profiles' | 'firmware'>('keymap');
   const [selectedKeyIndex, setSelectedKeyIndex] = useState<number | null>(null);
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
 
@@ -47,6 +58,18 @@ export const App: React.FC = () => {
     if (selectedKeyIndex === null) return;
     await session.remapKey(deviceState.activeLayer, selectedKeyIndex, item.code.toLowerCase());
     setSelectedKeyIndex(null);
+  };
+
+  const handleExportProfile = (id: number) => {
+    const json = session.exportProfile(id);
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const name = deviceState.profiles[id]?.name.toLowerCase().replace(/\s+/g, '_') || `profile_${id + 1}`;
+    a.download = `${name}.kerfprofile`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const activeLayer = deviceState.layers[deviceState.activeLayer] || deviceState.layers[0];
@@ -112,6 +135,30 @@ export const App: React.FC = () => {
           <PlaySquare className="w-4 h-4" />
           MACROS & RECORDER
         </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('profiles')}
+          className={`flex items-center gap-2 text-xs font-mono font-medium py-3 border-b-2 transition-all ${
+            activeTab === 'profiles'
+              ? 'border-amber-400 text-amber-300 font-bold'
+              : 'border-transparent text-zinc-400 hover:text-zinc-200'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          PROFILES (3 SLOTS)
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('firmware')}
+          className={`flex items-center gap-2 text-xs font-mono font-medium py-3 border-b-2 transition-all ${
+            activeTab === 'firmware'
+              ? 'border-amber-400 text-amber-300 font-bold'
+              : 'border-transparent text-zinc-400 hover:text-zinc-200'
+          }`}
+        >
+          <Cpu className="w-4 h-4" />
+          FIRMWARE & UF2
+        </button>
       </nav>
 
       <main className="flex-1 overflow-auto flex flex-col items-center justify-start p-8 relative">
@@ -173,6 +220,28 @@ export const App: React.FC = () => {
             slots={deviceState.macros}
             onSaveSlot={(slot) => session.updateMacroSlot(slot)}
             onClearSlot={(slotId) => session.clearMacroSlot(slotId)}
+            disabled={deviceState.locked && deviceState.connected}
+          />
+        )}
+
+        {activeTab === 'profiles' && (
+          <ProfileManager
+            profiles={deviceState.profiles}
+            activeProfileId={deviceState.activeProfileId}
+            onActivateProfile={(id) => session.activateProfile(id)}
+            onSaveProfile={(prof) => session.saveProfile(prof)}
+            onExportProfile={handleExportProfile}
+            onImportProfile={(id, json) => session.importProfile(id, json)}
+            disabled={deviceState.locked && deviceState.connected}
+          />
+        )}
+
+        {activeTab === 'firmware' && (
+          <FirmwareUpdater
+            currentVersion="1.0.0"
+            hardwareName={deviceState.name}
+            onRebootBootloader={() => session.rebootToBootloader()}
+            onFactoryReset={() => session.factoryReset()}
             disabled={deviceState.locked && deviceState.connected}
           />
         )}

@@ -4,6 +4,7 @@ package kerf;
 import "kerf/core.proto";
 import "kerf/lighting.proto";
 import "kerf/macros.proto";
+import "kerf/profiles.proto";
 import "kerf/power.proto";
 
 enum ErrorCode {
@@ -21,6 +22,7 @@ message Request {
     core.Request     core     = 10;
     lighting.Request lighting = 11;
     macros.Request   macros   = 12;
+    profiles.Request profiles = 13;
     power.Request    power    = 15;
   }
 }
@@ -32,6 +34,7 @@ message Response {
     core.Response     core     = 10;
     lighting.Response lighting = 11;
     macros.Response   macros   = 12;
+    profiles.Response profiles = 13;
     power.Response    power    = 15;
   }
 }

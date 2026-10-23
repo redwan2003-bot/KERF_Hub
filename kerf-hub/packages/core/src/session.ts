@@ -1,7 +1,17 @@
 import { StudioRpcClient } from './rpc/client';
 import { KerfClient } from './rpc/kerf-client';
 import { DeviceState, PhysicalKey, KeymapLayer } from './rpc/types';
-import { UnderglowConfig, BatledConfig, PowerConfig, MacroSlot, MAX_MACRO_SLOTS } from '@kerf/protocol';
+import {
+  UnderglowConfig,
+  BatledConfig,
+  PowerConfig,
+  MacroSlot,
+  MAX_MACRO_SLOTS,
+  ProfileData,
+  MAX_PROFILES,
+  KerfProfileFile,
+  validateKerfProfileFile,
+} from '@kerf/protocol';
 
 export function getDefaultLP63Keys(): PhysicalKey[] {
   const keys: PhysicalKey[] = [];
@@ -66,6 +76,8 @@ export interface ExtendedDeviceState extends DeviceState {
   batled: BatledConfig;
   power: PowerConfig;
   macros: MacroSlot[];
+  activeProfileId: number;
+  profiles: ProfileData[];
 }
 
 export class SessionManager {
@@ -107,6 +119,36 @@ export class SessionManager {
       slotId: i,
       name: `Macro ${i}`,
       steps: [],
+    })),
+    activeProfileId: 0,
+    profiles: new Array(MAX_PROFILES).fill(null).map((_, i) => ({
+      profileId: i,
+      name: `Profile ${i + 1}`,
+      underglow: {
+        on: true,
+        hue: i === 0 ? 160 : i === 1 ? 0 : 280,
+        saturation: 100,
+        brightness: 50,
+        effect: 0,
+        speed: 1,
+        autoOffIdle: true,
+        autoOffUsb: false,
+      },
+      batled: {
+        brightness: 100,
+        lowBrightness: 20,
+        tapMs: 1000,
+        maxHoldMs: 10000,
+        lowPercent: 10,
+        repeatMin: 5,
+      },
+      power: {
+        debouncePressMs: i === 1 ? 1 : 5,
+        debounceReleaseMs: i === 1 ? 2 : 5,
+        idleTimeoutMs: 30000,
+        deepSleepTimeoutMs: 900000,
+      },
+      macros: [],
     })),
   };
   private listeners: Array<(state: ExtendedDeviceState) => void> = [];
@@ -200,6 +242,78 @@ export class SessionManager {
       this.notify();
       await this.kerfClient.clearMacroSlot(slotId);
     }
+  }
+
+  public async activateProfile(profileId: number): Promise<void> {
+    if (profileId >= 0 && profileId < MAX_PROFILES) {
+      this.state.activeProfileId = profileId;
+      const target = this.state.profiles[profileId];
+      if (target) {
+        this.state.underglow = { ...target.underglow };
+        this.state.batled = { ...target.batled };
+        this.state.power = { ...target.power };
+        if (target.macros && target.macros.length > 0) {
+          this.state.macros = [...target.macros];
+        }
+      }
+      this.notify();
+      await this.kerfClient.activateProfile(profileId);
+    }
+  }
+
+  public async saveProfile(profile: ProfileData): Promise<void> {
+    if (profile.profileId >= 0 && profile.profileId < MAX_PROFILES) {
+      this.state.profiles[profile.profileId] = { ...profile };
+      if (this.state.activeProfileId === profile.profileId) {
+        this.state.underglow = { ...profile.underglow };
+        this.state.batled = { ...profile.batled };
+        this.state.power = { ...profile.power };
+        this.state.macros = [...profile.macros];
+      }
+      this.notify();
+      await this.kerfClient.saveProfile(profile);
+    }
+  }
+
+  public exportProfile(profileId: number): string {
+    const profile = this.state.profiles[profileId] || this.state.profiles[0];
+    const exportFile: KerfProfileFile = {
+      format: 'kerfprofile',
+      version: 1,
+      exportedAt: new Date().toISOString(),
+      modelId: this.state.modelId,
+      profileName: profile.name,
+      data: {
+        name: profile.name,
+        underglow: profile.underglow,
+        batled: profile.batled,
+        power: profile.power,
+        macros: profile.macros,
+      },
+    };
+    return JSON.stringify(exportFile, null, 2);
+  }
+
+  public async importProfile(profileId: number, jsonString: string): Promise<void> {
+    const parsed = JSON.parse(jsonString);
+    const valid = validateKerfProfileFile(parsed);
+    const updated: ProfileData = {
+      profileId,
+      name: valid.profileName || valid.data.name || `Imported Profile ${profileId + 1}`,
+      underglow: valid.data.underglow,
+      batled: valid.data.batled,
+      power: valid.data.power,
+      macros: valid.data.macros || [],
+    };
+    await this.saveProfile(updated);
+  }
+
+  public async rebootToBootloader(): Promise<void> {
+    await this.kerfClient.rebootToBootloader();
+  }
+
+  public async factoryReset(): Promise<void> {
+    await this.kerfClient.factoryReset();
   }
 
   public getState(): ExtendedDeviceState {

@@ -4,6 +4,8 @@ import {
   BatledConfig,
   PowerConfig,
   MacroSlot,
+  ProfileMetadata,
+  ProfileData,
   DeviceInfo,
   DeviceRole,
   LinkType,
@@ -139,6 +141,55 @@ export class KerfClient {
     payload[0] = 12; // KERF_SUBSYSTEM_MACROS
     payload[1] = 3;  // ClearMacroSlot
     payload[2] = slotId;
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async rebootToBootloader(): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 10; // KERF_SUBSYSTEM_CORE
+    payload[1] = 2;  // RebootBootloader
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async factoryReset(): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 10; // KERF_SUBSYSTEM_CORE
+    payload[1] = 3;  // FactoryReset
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async listProfiles(): Promise<{ activeProfileId: number; profiles: ProfileMetadata[] }> {
+    return {
+      activeProfileId: 0,
+      profiles: [
+        { profileId: 0, name: 'Profile 1', active: true },
+        { profileId: 1, name: 'Profile 2', active: false },
+        { profileId: 2, name: 'Profile 3', active: false },
+      ],
+    };
+  }
+
+  public async getProfile(_profileId: number): Promise<ProfileData | null> {
+    return null;
+  }
+
+  public async saveProfile(profile: ProfileData): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 13; // KERF_SUBSYSTEM_PROFILES
+    payload[1] = 3;  // SaveProfile
+    payload[2] = profile.profileId;
+    await this.transport.sendReport(0, payload);
+  }
+
+  public async activateProfile(profileId: number): Promise<void> {
+    if (!this.transport.connected) return;
+    const payload = new Uint8Array(64);
+    payload[0] = 13; // KERF_SUBSYSTEM_PROFILES
+    payload[1] = 4;  // ActivateProfile
+    payload[2] = profileId;
     await this.transport.sendReport(0, payload);
   }
 

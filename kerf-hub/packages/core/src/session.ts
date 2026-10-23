@@ -54,23 +54,63 @@ export function getDefaultLP63Keys(): PhysicalKey[] {
   return keys;
 }
 
+export const FACTORY_LP63_LAYER0 = [
+  // Row 0 (13 keys)
+  { behaviorId: 'ESC' }, { behaviorId: '1' }, { behaviorId: '2' }, { behaviorId: '3' }, { behaviorId: '4' },
+  { behaviorId: '5' }, { behaviorId: '6' }, { behaviorId: '7' }, { behaviorId: '8' }, { behaviorId: '9' },
+  { behaviorId: '0' }, { behaviorId: '-' }, { behaviorId: '=' },
+  // Row 1 (13 keys)
+  { behaviorId: 'TAB' }, { behaviorId: 'Q' }, { behaviorId: 'W' }, { behaviorId: 'E' }, { behaviorId: 'R' },
+  { behaviorId: 'T' }, { behaviorId: 'Y' }, { behaviorId: 'U' }, { behaviorId: 'I' }, { behaviorId: 'O' },
+  { behaviorId: 'P' }, { behaviorId: '[' }, { behaviorId: ']' },
+  // Row 2 (13 keys)
+  { behaviorId: 'CAPS' }, { behaviorId: 'A' }, { behaviorId: 'S' }, { behaviorId: 'D' }, { behaviorId: 'F' },
+  { behaviorId: 'G' }, { behaviorId: 'H' }, { behaviorId: 'J' }, { behaviorId: 'K' }, { behaviorId: 'L' },
+  { behaviorId: ';' }, { behaviorId: "'" }, { behaviorId: 'ENTER' },
+  // Row 3 (13 keys)
+  { behaviorId: 'SHIFT' }, { behaviorId: 'Z' }, { behaviorId: 'X' }, { behaviorId: 'C' }, { behaviorId: 'V' },
+  { behaviorId: 'B' }, { behaviorId: 'N' }, { behaviorId: 'M' }, { behaviorId: ',' }, { behaviorId: '.' },
+  { behaviorId: '/' }, { behaviorId: 'SHIFT' }, { behaviorId: 'UP' },
+  // Row 4 (13 keys)
+  { behaviorId: 'CTRL' }, { behaviorId: 'WIN' }, { behaviorId: 'ALT' }, { behaviorId: 'SPACE' }, { behaviorId: 'ALT' },
+  { behaviorId: 'MO(1)' }, { behaviorId: 'SNIP' }, { behaviorId: 'CTRL' }, { behaviorId: 'LEFT' }, { behaviorId: 'DOWN' },
+  { behaviorId: 'RIGHT' }, { behaviorId: 'BSPC' }, { behaviorId: 'DEL' },
+];
+
+export const FACTORY_LP63_LAYER1 = [
+  // Row 0 (13 keys)
+  { behaviorId: 'BATLED' }, { behaviorId: 'F1' }, { behaviorId: 'F2' }, { behaviorId: 'F3' }, { behaviorId: 'F4' },
+  { behaviorId: 'F5' }, { behaviorId: 'F6' }, { behaviorId: 'F7' }, { behaviorId: 'F8' }, { behaviorId: 'F9' },
+  { behaviorId: 'F10' }, { behaviorId: 'F11' }, { behaviorId: 'F12' },
+  // Row 1 (13 keys)
+  { behaviorId: 'trans' }, { behaviorId: 'BT 1' }, { behaviorId: 'BT 2' }, { behaviorId: 'BT 3' }, { behaviorId: 'BT CLR' },
+  { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' },
+  { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' },
+  // Row 2 (13 keys)
+  { behaviorId: 'trans' }, { behaviorId: 'RGB TOG' }, { behaviorId: 'RGB HUI' }, { behaviorId: 'RGB SAI' }, { behaviorId: 'RGB BRI' },
+  { behaviorId: 'RGB EFF' }, { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' },
+  { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' },
+  // Row 3 (13 keys)
+  { behaviorId: 'trans' }, { behaviorId: 'RGB HUD' }, { behaviorId: 'RGB SAD' }, { behaviorId: 'RGB BRD' }, { behaviorId: 'RGB EFR' },
+  { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' },
+  { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'PG UP' },
+  // Row 4 (13 keys)
+  { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' }, { behaviorId: 'trans' },
+  { behaviorId: 'trans' }, { behaviorId: 'PRINT' }, { behaviorId: 'UNLOCK' }, { behaviorId: 'HOME' }, { behaviorId: 'PG DN' },
+  { behaviorId: 'END' }, { behaviorId: 'UNLOCK' }, { behaviorId: 'BOOT' },
+];
+
 export function getDefaultLP63Layers(): KeymapLayer[] {
   return [
     {
       id: 0,
       name: 'Default',
-      bindings: new Array(65).fill(null).map((_, i) => ({
-        behaviorId: 'kp',
-        param1: i,
-      })),
+      bindings: FACTORY_LP63_LAYER0.map((b) => ({ ...b })),
     },
     {
       id: 1,
       name: 'Function',
-      bindings: new Array(65).fill(null).map(() => ({
-        behaviorId: 'trans',
-        param1: 0,
-      })),
+      bindings: FACTORY_LP63_LAYER1.map((b) => ({ ...b })),
     },
   ];
 }
@@ -93,7 +133,7 @@ export class SessionManager {
     connected: false,
     modelId: 'kerf-lp63',
     name: 'kerf_keeb LP63',
-    locked: true,
+    locked: false, // Disconnected simulator starts unlocked for interactive playground
     activeLayer: 0,
     layers: getDefaultLP63Layers(),
     keys: getDefaultLP63Keys(),

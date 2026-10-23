@@ -49,7 +49,7 @@ export const App: React.FC = () => {
   };
 
   const handleKeySelect = (index: number) => {
-    if (deviceState.locked) {
+    if (deviceState.connected && deviceState.locked) {
       setIsUnlockModalOpen(true);
       return;
     }
@@ -200,7 +200,7 @@ export const App: React.FC = () => {
                 layers={deviceState.layers}
                 activeLayerId={deviceState.activeLayer}
                 onSelectLayer={(id) => session.setActiveLayer(id)}
-                disabled={deviceState.locked}
+                disabled={deviceState.locked && deviceState.connected}
               />
 
               {deviceState.locked && deviceState.connected && (
